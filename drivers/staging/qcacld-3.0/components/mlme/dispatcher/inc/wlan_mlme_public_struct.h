@@ -1123,6 +1123,15 @@ struct wlan_mlme_chainmask {
 	bool enable_bt_chain_separation;
 };
 
+/**
+ * struct dual_sta_policy - Concurrent STA policy configuration
+ * @concurrent_sta_policy: Possible values are defined in enum
+ * qca_wlan_concurrent_sta_policy_config
+ */
+struct dual_sta_policy {
+	uint8_t concurrent_sta_policy;
+};
+
 /* struct wlan_mlme_generic - Generic CFG config items
  *
  * @band_capability: HW Band Capability - Both or 2.4G only or 5G only
@@ -1163,6 +1172,7 @@ struct wlan_mlme_chainmask {
  * @stop_all_host_scan_support: Target capability that indicates if the target
  * supports stop all host scan request type.
  * @sae_connect_retries: sae connect retry bitmask
+ * @dual_sta_policy: Dual STA policies configuration
  */
 struct wlan_mlme_generic {
 	uint32_t band_capability;
@@ -1200,6 +1210,7 @@ struct wlan_mlme_generic {
 	bool enable_peer_unmap_conf_support;
 	bool stop_all_host_scan_support;
 	uint32_t sae_connect_retries;
+	struct dual_sta_policy dual_sta_policy;
 };
 
 /*
