@@ -481,16 +481,17 @@ static int kernel_debug_open(struct inode *inode, struct file *file)
 static ssize_t kernel_debug_read(struct file *file, char __user *buf,
                                  size_t count, loff_t *pos)
 {
-/* /sys/kernel/debug/ftm_tfa98xx */
-	const int size = 1024;
-	char buffer[size];
+	/* /sys/kernel/debug/ftm_tfa98xx */
+	char buffer[1024];
 	int n = 0;
 
 	n += scnprintf(buffer + n, sizeof(buffer) - n, "%s ", ftm_load_file);
 	n += scnprintf(buffer + n, sizeof(buffer) - n, "%s ", ftm_clk);
-	n += scnprintf(buffer + n, sizeof(buffer) - n, "%s ", ftm_SpeakerCalibration);
+	n += scnprintf(buffer + n, sizeof(buffer) - n, "%s ",
+		       ftm_SpeakerCalibration);
 	n += scnprintf(buffer + n, sizeof(buffer) - n, "%s ", ftm_path);
-	n += scnprintf(buffer + n, sizeof(buffer) - n, "%s ", ftm_spk_resistance);
+	n += scnprintf(buffer + n, sizeof(buffer) - n, "%s ",
+		       ftm_spk_resistance);
 	n += scnprintf(buffer + n, sizeof(buffer) - n, "%s ", ftm_tfa98xx_flag);
 	n += scnprintf(buffer + n, sizeof(buffer) - n, "%d ", ftm_mode);
 
