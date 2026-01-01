@@ -41,10 +41,6 @@
 #include "haptic_hv_reg.h"
 #include "haptic_hv_rtp_key_data.h"
 
-#ifdef CONFIG_HAPTIC_FEEDBACK_MODULE
-#include "haptic_feedback.h"
-#endif
-
 #define HAPTIC_HV_DRIVER_VERSION	"v0.0.0.13"
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0))
 /* add for DX-2 bringup */
@@ -698,16 +694,16 @@ static char aw_rtp_name_162Hz[][AW_RTP_NAME_MAX] = {
 	{"aw8697_reserved_159.bin"},
 	{"aw8697_reserved_160.bin"},
 
-	{"aw8697_oplus_its_oplus_RTP_161_162Hz.bin"},
-	{"aw8697_oplus_tune_RTP_162_162Hz.bin"},
-	{"aw8697_oplus_jingle_RTP_163_162Hz.bin"},
+	{"aw8697_realme_its_realme_RTP_161_162Hz.bin"},
+	{"aw8697_realme_tune_RTP_162_162Hz.bin"},
+	{"aw8697_realme_jingle_RTP_163_162Hz.bin"},
 	{"aw8697_reserved_164.bin"},
 	{"aw8697_reserved_165.bin"},
 	{"aw8697_reserved_166.bin"},
 	{"aw8697_reserved_167.bin"},
 	{"aw8697_reserved_168.bin"},
 	{"aw8697_reserved_169.bin"},
-	{"aw8697_oplus_gt_RTP_170_162Hz.bin"},
+	{"aw8697_realme_gt_RTP_170_162Hz.bin"},
 
 	{"aw8697_Threefingers_Long_RTP_171.bin"},
 	{"aw8697_Threefingers_Up_RTP_172.bin"},
@@ -1129,16 +1125,16 @@ static char aw_rtp_name_166Hz[][AW_RTP_NAME_MAX] = {
 	{"aw8697_reserved_159.bin"},
 	{"aw8697_reserved_160.bin"},
 
-	{"aw8697_oplus_its_oplus_RTP_161_166Hz.bin"},
-	{"aw8697_oplus_tune_RTP_162_166Hz.bin"},
-	{"aw8697_oplus_jingle_RTP_163_166Hz.bin"},
+	{"aw8697_realme_its_realme_RTP_161_166Hz.bin"},
+	{"aw8697_realme_tune_RTP_162_166Hz.bin"},
+	{"aw8697_realme_jingle_RTP_163_166Hz.bin"},
 	{"aw8697_reserved_164.bin"},
 	{"aw8697_reserved_165.bin"},
 	{"aw8697_reserved_166.bin"},
 	{"aw8697_reserved_167.bin"},
 	{"aw8697_reserved_168.bin"},
 	{"aw8697_reserved_169.bin"},
-	{"aw8697_oplus_gt_RTP_170_166Hz.bin"},
+	{"aw8697_realme_gt_RTP_170_166Hz.bin"},
 
 	{"aw8697_Threefingers_Long_RTP_171.bin"},
 	{"aw8697_Threefingers_Up_RTP_172.bin"},
@@ -1558,16 +1554,16 @@ static char aw_rtp_name_174Hz[][AW_RTP_NAME_MAX] = {
 	{"aw8697_reserved_159.bin"},
 	{"aw8697_reserved_160.bin"},
 
-	{"aw8697_oplus_its_oplus_RTP_161_174Hz.bin"},
-	{"aw8697_oplus_tune_RTP_162_174Hz.bin"},
-	{"aw8697_oplus_jingle_RTP_163_174Hz.bin"},
+	{"aw8697_realme_its_realme_RTP_161_174Hz.bin"},
+	{"aw8697_realme_tune_RTP_162_174Hz.bin"},
+	{"aw8697_realme_jingle_RTP_163_174Hz.bin"},
 	{"aw8697_reserved_164.bin"},
 	{"aw8697_reserved_165.bin"},
 	{"aw8697_reserved_166.bin"},
 	{"aw8697_reserved_167.bin"},
 	{"aw8697_reserved_168.bin"},
 	{"aw8697_reserved_169.bin"},
-	{"aw8697_oplus_gt_RTP_170_174Hz.bin"},
+	{"aw8697_realme_gt_RTP_170_174Hz.bin"},
 
 	{"aw8697_Threefingers_Long_RTP_171.bin"},
 	{"aw8697_Threefingers_Up_RTP_172.bin"},
@@ -1989,16 +1985,16 @@ static char aw_rtp_name_178Hz[][AW_RTP_NAME_MAX] = {
 	{"aw8697_reserved_159.bin"},
 	{"aw8697_reserved_160.bin"},
 
-	{"aw8697_oplus_its_oplus_RTP_161_178Hz.bin"},
-	{"aw8697_oplus_tune_RTP_162_178Hz.bin"},
-	{"aw8697_oplus_jingle_RTP_163_178Hz.bin"},
+	{"aw8697_realme_its_realme_RTP_161_178Hz.bin"},
+	{"aw8697_realme_tune_RTP_162_178Hz.bin"},
+	{"aw8697_realme_jingle_RTP_163_178Hz.bin"},
 	{"aw8697_reserved_164.bin"},
 	{"aw8697_reserved_165.bin"},
 	{"aw8697_reserved_166.bin"},
 	{"aw8697_reserved_167.bin"},
 	{"aw8697_reserved_168.bin"},
 	{"aw8697_reserved_169.bin"},
-	{"aw8697_oplus_gt_RTP_170_178Hz.bin"},
+	{"aw8697_realme_gt_RTP_170_178Hz.bin"},
 
 	{"aw8697_Threefingers_Long_RTP_171.bin"},
 	{"aw8697_Threefingers_Up_RTP_172.bin"},
@@ -2424,16 +2420,16 @@ static char aw_rtp_name[][AW_RTP_NAME_MAX] = {
 	{"aw8697_reserved_159.bin"},
 	{"aw8697_reserved_160.bin"},
 
-	{"aw8697_oplus_its_oplus_RTP_161_170Hz.bin"},
-	{"aw8697_oplus_tune_RTP_162_170Hz.bin"},
-	{"aw8697_oplus_jingle_RTP_163_170Hz.bin"},
+	{"aw8697_realme_its_realme_RTP_161_170Hz.bin"},
+	{"aw8697_realme_tune_RTP_162_170Hz.bin"},
+	{"aw8697_realme_jingle_RTP_163_170Hz.bin"},
 	{"aw8697_reserved_164.bin"},
 	{"aw8697_reserved_165.bin"},
 	{"aw8697_reserved_166.bin"},
 	{"aw8697_reserved_167.bin"},
 	{"aw8697_reserved_168.bin"},
 	{"aw8697_reserved_169.bin"},
-	{"aw8697_oplus_gt_RTP_170_170Hz.bin"},
+	{"aw8697_realme_gt_RTP_170_170Hz.bin"},
 
 	{"aw8697_Threefingers_Long_RTP_171.bin"},
 	{"aw8697_Threefingers_Up_RTP_172.bin"},
@@ -2878,9 +2874,9 @@ static char aw_rtp_name_19065_226Hz[][AW_RTP_NAME_MAX] = {
 	{"aw8697_reserved_159.bin"},
 	{"aw8697_reserved_160.bin"},
 
-	{"aw8697_oplus_its_oplus_RTP_161_235Hz.bin"},
-	{"aw8697_oplus_tune_RTP_162_235Hz.bin"},
-	{"aw8697_oplus_jingle_RTP_163_235Hz.bin"},
+	{"aw8697_realme_its_realme_RTP_161_235Hz.bin"},
+	{"aw8697_realme_tune_RTP_162_235Hz.bin"},
+	{"aw8697_realme_jingle_RTP_163_235Hz.bin"},
 	{"aw8697_reserved_164.bin"},
 	{"aw8697_reserved_165.bin"},
 	{"aw8697_reserved_166.bin"},
@@ -3071,9 +3067,9 @@ static char aw_rtp_name_19065_230Hz[][AW_RTP_NAME_MAX] = {
 	{"aw8697_reserved_159.bin"},
 	{"aw8697_reserved_160.bin"},
 
-	{"aw8697_oplus_its_oplus_RTP_161_235Hz.bin"},
-	{"aw8697_oplus_tune_RTP_162_235Hz.bin"},
-	{"aw8697_oplus_jingle_RTP_163_235Hz.bin"},
+	{"aw8697_realme_its_realme_RTP_161_235Hz.bin"},
+	{"aw8697_realme_tune_RTP_162_235Hz.bin"},
+	{"aw8697_realme_jingle_RTP_163_235Hz.bin"},
 	{"aw8697_reserved_164.bin"},
 	{"aw8697_reserved_165.bin"},
 	{"aw8697_reserved_166.bin"},
@@ -3265,9 +3261,9 @@ static char aw_rtp_name_19065_234Hz[][AW_RTP_NAME_MAX] = {
 	{"aw8697_reserved_159.bin"},
 	{"aw8697_reserved_160.bin"},
 
-	{"aw8697_oplus_its_oplus_RTP_161_235Hz.bin"},
-	{"aw8697_oplus_tune_RTP_162_235Hz.bin"},
-	{"aw8697_oplus_jingle_RTP_163_235Hz.bin"},
+	{"aw8697_realme_its_realme_RTP_161_235Hz.bin"},
+	{"aw8697_realme_tune_RTP_162_235Hz.bin"},
+	{"aw8697_realme_jingle_RTP_163_235Hz.bin"},
 	{"aw8697_reserved_164.bin"},
 	{"aw8697_reserved_165.bin"},
 	{"aw8697_reserved_166.bin"},
@@ -3459,9 +3455,6 @@ static int container_init(int size)
 		aw_rtp = vmalloc(size);
 		if (!aw_rtp) {
 			aw_dev_err("%s: error allocating memory\n", __func__);
-#ifdef CONFIG_HAPTIC_FEEDBACK_MODULE
-			(void)oplus_haptic_track_mem_alloc_err(HAPTIC_MEM_ALLOC_TRACK, size, __func__);
-#endif
 			return -ENOMEM;
 		}
 		aw_container_size = size;
@@ -3499,9 +3492,6 @@ int i2c_r_bytes(struct aw_haptic *aw_haptic, uint8_t reg_addr, uint8_t *buf,
 	ret = i2c_transfer(aw_haptic->i2c->adapter, msg, ARRAY_SIZE(msg));
 	if (ret < 0) {
 		aw_dev_err("%s: transfer failed.", __func__);
-#ifdef CONFIG_HAPTIC_FEEDBACK_MODULE
-		(void)oplus_haptic_track_dev_err(HAPTIC_I2C_READ_TRACK_ERR, reg_addr, ret);
-#endif
 		return ret;
 	} else if (ret != 2) {
 		aw_dev_err("%s: transfer failed(size error).", __func__);
@@ -3527,9 +3517,6 @@ int i2c_w_bytes(struct aw_haptic *aw_haptic, uint8_t reg_addr, uint8_t *buf,
 	if (ret < 0) {
 		aw_dev_err("%s: i2c master send 0x%02x error\n",
 			   __func__, reg_addr);
-#ifdef CONFIG_HAPTIC_FEEDBACK_MODULE
-		(void)oplus_haptic_track_dev_err(HAPTIC_I2C_WRITE_TRACK_ERR, reg_addr, ret);
-#endif
 	}
 	kfree(data);
 	return ret;
@@ -3960,9 +3947,6 @@ static void ram_load(const struct firmware *cont, void *context)
 	/* aw ram update */
 	awinic_fw = kzalloc(cont->size + sizeof(int), GFP_KERNEL);
 	if (!awinic_fw) {
-#ifdef CONFIG_HAPTIC_FEEDBACK_MODULE
-		(void)oplus_haptic_track_mem_alloc_err(HAPTIC_MEM_ALLOC_TRACK, cont->size + sizeof(int), __func__);
-#endif
 		release_firmware(cont);
 		aw_dev_err("%s: Error allocating memory\n",
 			   __func__);
@@ -4164,10 +4148,6 @@ static int f0_cali(struct aw_haptic *aw_haptic)
 	if (aw_haptic->func->get_f0(aw_haptic)) {
 		aw_dev_err("%s: get f0 error, user defafult f0\n",
 			   __func__);
-#ifdef CONFIG_HAPTIC_FEEDBACK_MODULE
-		(void)oplus_haptic_track_fre_cail(HAPTIC_F0_CALI_TRACK, aw_haptic->f0,
-						  0, "aw_haptic->func->get_f0 is null");
-#endif
 	} else {
 		/* max and min limit */
 		f0_limit = aw_haptic->f0;
@@ -4180,10 +4160,6 @@ static int f0_cali(struct aw_haptic *aw_haptic)
 			aw_dev_err("%s: f0 calibration out of range = %d!\n",
 				   __func__, aw_haptic->f0);
 			f0_limit = aw_haptic->info.f0_pre;
-#ifdef CONFIG_HAPTIC_FEEDBACK_MODULE
-			(void)oplus_haptic_track_fre_cail(HAPTIC_F0_CALI_TRACK, aw_haptic->f0,
-							  -ERANGE, "f0 out of range");
-#endif
 			return -ERANGE;
 		}
 		aw_dev_info("%s: f0_limit = %d\n", __func__,
@@ -4242,9 +4218,6 @@ void get_f0_cali_data(struct aw_haptic *aw_haptic)
 		aw_dev_err("%s: f0 calibration out of range = %d!\n",
 				__func__, aw_haptic->f0);
 		f0_limit = aw_haptic->info.f0_pre;
-#ifdef CONFIG_HAPTIC_FEEDBACK_MODULE
-		(void)oplus_haptic_track_fre_cail(HAPTIC_F0_CALI_TRACK, aw_haptic->f0, -ERANGE, "f0 out of range");
-#endif
 		return;
 	}
 	aw_dev_info("%s: f0_limit = %d\n", __func__,
@@ -4359,10 +4332,6 @@ static int rtp_osc_cali(struct aw_haptic *aw_haptic)
 	if (ret < 0) {
 		aw_dev_err("%s: failed to read %s\n", __func__,
 			   aw_rtp_name[0]);
-#ifdef CONFIG_HAPTIC_FEEDBACK_MODULE
-		(void)oplus_haptic_track_fre_cail(HAPTIC_OSC_CALI_TRACK, aw_haptic->f0, ret,
-						  "rtp_osc_cali request_firmware fail");
-#endif
 		return ret;
 	}
 	/*aw_haptic add stop,for irq interrupt during calibrate */

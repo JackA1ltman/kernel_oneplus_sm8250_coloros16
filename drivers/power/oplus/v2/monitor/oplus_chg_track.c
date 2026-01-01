@@ -23,10 +23,6 @@
 #ifndef CONFIG_DISABLE_OPLUS_FUNCTION
 #include <soc/oplus/system/boot_mode.h>
 #endif
-#if defined(CONFIG_OPLUS_FEATURE_FEEDBACK) ||	\
-	defined(CONFIG_OPLUS_FEATURE_FEEDBACK_MODULE)
-#include <soc/oplus/system/kernel_fb.h>
-#endif
 #ifndef CONFIG_DISABLE_OPLUS_FUNCTION
 #include <soc/oplus/system/oplus_project.h>
 #endif
@@ -793,10 +789,6 @@ struct oplus_chg_track {
 	wait_queue_head_t upload_wq;
 
 	struct workqueue_struct *trigger_upload_wq;
-#if defined(CONFIG_OPLUS_FEATURE_FEEDBACK) || \
-	defined(CONFIG_OPLUS_FEATURE_FEEDBACK_MODULE)
-	struct kernel_packet_info *dcs_info;
-#endif
 	struct delayed_work upload_info_dwork;
 	struct mutex dcs_info_lock;
 	int dwork_retry_cnt;
@@ -935,10 +927,6 @@ static struct oplus_chg_track_status *temp_track_status;
 static DEFINE_MUTEX(debugfs_root_mutex);
 static DEFINE_SPINLOCK(gauge_fifo_lock);
 
-#if defined(CONFIG_OPLUS_FEATURE_FEEDBACK) || \
-	defined(CONFIG_OPLUS_FEATURE_FEEDBACK_MODULE)
-static int oplus_chg_track_pack_dcs_info(struct oplus_chg_track *chip);
-#endif
 static int
 oplus_chg_track_get_charger_type(struct oplus_monitor *monitor,
 				 struct oplus_chg_track_status *track_status,
@@ -962,6 +950,7 @@ static void oplus_chg_track_sub_gauge_sili_alg_lifetime_work(struct work_struct 
 static void oplus_chg_track_gauge_sili_alg_monitor_work(struct work_struct *work);
 static void oplus_chg_track_sub_gauge_sili_alg_monitor_work(struct work_struct *work);
 
+<<<<<<< HEAD
 #if defined(CONFIG_OPLUS_FEATURE_FEEDBACK) || \
 	defined(CONFIG_OPLUS_FEATURE_FEEDBACK_MODULE)
 static struct type_reason_table track_type_reason_table[] = {
@@ -1060,6 +1049,8 @@ static struct flag_reason_table track_flag_reason_table[] = {
 };
 #endif
 
+=======
+>>>>>>> e38840c47398 (treewide: Drop oplus feedback)
 static struct oplus_chg_track_type wired_type_table[] = {
 	{ OPLUS_CHG_USB_TYPE_UNKNOWN, TRACK_POWER_2500MW, "unknow" },
 	{ OPLUS_CHG_USB_TYPE_SDP, TRACK_POWER_2500MW, "sdp" },
@@ -4636,43 +4627,10 @@ static int oplus_chg_track_init(struct oplus_chg_track *track_dev)
 	return ret;
 }
 
-#if defined(CONFIG_OPLUS_FEATURE_FEEDBACK) || \
-	defined(CONFIG_OPLUS_FEATURE_FEEDBACK_MODULE)
-static int oplus_chg_track_get_type_tag(int type_reason, char *type_reason_tag)
-{
-	int i = 0;
-
-	for (i = 0; i < ARRAY_SIZE(track_type_reason_table); i++) {
-		if (track_type_reason_table[i].type_reason == type_reason) {
-			strncpy(type_reason_tag,
-				track_type_reason_table[i].type_reason_tag,
-				OPLUS_CHG_TRIGGER_REASON_TAG_LEN - 1);
-			break;
-		}
-	}
-	return i;
-}
-
-static int oplus_chg_track_get_flag_tag(int flag_reason, char *flag_reason_tag)
-{
-	int i = 0;
-
-	for (i = 0; i < ARRAY_SIZE(track_flag_reason_table); i++) {
-		if (track_flag_reason_table[i].flag_reason == flag_reason) {
-			strncpy(flag_reason_tag,
-				track_flag_reason_table[i].flag_reason_tag,
-				OPLUS_CHG_TRIGGER_REASON_TAG_LEN - 1);
-			break;
-		}
-	}
-	return i;
-}
-#else
 static int oplus_chg_track_get_flag_tag(int flag_reason, char *flag_reason_tag)
 {
 	return 0;
 }
-#endif
 
 static bool oplus_chg_track_trigger_data_is_valid(oplus_chg_track_trigger *pdata)
 {
@@ -4828,10 +4786,6 @@ static int oplus_chg_track_thread(void *data)
 			chg_err("oplus chg false wakeup, rc=%d\n", rc);
 		mutex_lock(&chip->trigger_data_lock);
 		chip->trigger_data_ok = false;
-#if defined(CONFIG_OPLUS_FEATURE_FEEDBACK) || \
-	defined(CONFIG_OPLUS_FEATURE_FEEDBACK_MODULE)
-		oplus_chg_track_pack_dcs_info(chip);
-#endif
 		chip->dwork_retry_cnt = OPLUS_CHG_TRACK_DWORK_RETRY_CNT;
 		queue_delayed_work(chip->trigger_upload_wq,
 				   &chip->upload_info_dwork, 0);
@@ -4933,6 +4887,7 @@ int oplus_chg_track_get_bidirect_cp_err_reason(int err_type, char *err_reason, i
 */
 #define TRACK_VERSION	"3.4"
 
+<<<<<<< HEAD
 #if defined(CONFIG_OPLUS_FEATURE_FEEDBACK) || \
 	defined(CONFIG_OPLUS_FEATURE_FEEDBACK_MODULE)
 static int oplus_chg_track_pack_dcs_info(struct oplus_chg_track *chip)
@@ -5002,6 +4957,8 @@ static int oplus_chg_track_pack_dcs_info(struct oplus_chg_track *chip)
 }
 #endif
 
+=======
+>>>>>>> e38840c47398 (treewide: Drop oplus feedback)
 static void oplus_chg_track_upload_info_dwork(struct work_struct *work)
 {
 	int ret = 0;
@@ -5013,10 +4970,6 @@ static void oplus_chg_track_upload_info_dwork(struct work_struct *work)
 		return;
 
 	mutex_lock(&chip->dcs_info_lock);
-#if defined(CONFIG_OPLUS_FEATURE_FEEDBACK) ||	\
-	defined(CONFIG_OPLUS_FEATURE_FEEDBACK_MODULE)
-	ret = fb_kevent_send_to_user(chip->dcs_info);
-#endif
 	mutex_unlock(&chip->dcs_info_lock);
 	if (!ret)
 		complete(&chip->trigger_ack);
@@ -10003,16 +9956,6 @@ int oplus_chg_track_driver_init(struct oplus_monitor *monitor)
 	monitor->track = track_dev;
 	track_dev->monitor = monitor;
 
-#if defined(CONFIG_OPLUS_FEATURE_FEEDBACK) || \
-	defined(CONFIG_OPLUS_FEATURE_FEEDBACK_MODULE)
-	track_dev->dcs_info = (struct kernel_packet_info *)kmalloc(
-		sizeof(char) * OPLUS_CHG_TRIGGER_MSG_LEN, GFP_KERNEL);
-	if (track_dev->dcs_info == NULL) {
-		rc = -ENOMEM;
-		goto dcs_info_kmalloc_fail;
-	}
-#endif
-
 	temp_track_status = (struct oplus_chg_track_status *)kmalloc(
 		sizeof(struct oplus_chg_track_status), GFP_KERNEL);
 	if (temp_track_status == NULL) {
@@ -10088,11 +10031,14 @@ bcc_info_kzmalloc_fail:
 	if (track_debugfs_root)
 		debugfs_remove_recursive(track_debugfs_root);
 debugfs_create_fail:
+<<<<<<< HEAD
 #if defined(CONFIG_OPLUS_FEATURE_FEEDBACK) || \
 	defined(CONFIG_OPLUS_FEATURE_FEEDBACK_MODULE)
 	kfree(track_dev->dcs_info);
 #endif
 dcs_info_kmalloc_fail:
+=======
+>>>>>>> e38840c47398 (treewide: Drop oplus feedback)
 	devm_kfree(monitor->dev, track_dev);
 	monitor->track = NULL;
 	return rc;
@@ -10117,11 +10063,14 @@ int oplus_chg_track_driver_exit(struct oplus_monitor *monitor)
 
 	if (track_debugfs_root)
 		debugfs_remove_recursive(track_debugfs_root);
+<<<<<<< HEAD
 #if defined(CONFIG_OPLUS_FEATURE_FEEDBACK) || \
 	defined(CONFIG_OPLUS_FEATURE_FEEDBACK_MODULE)
 	kfree(track_dev->dcs_info);
 #endif
 	kfree(track_dev->track_status.bcc_info);
+=======
+>>>>>>> e38840c47398 (treewide: Drop oplus feedback)
 	devm_kfree(monitor->dev, track_dev);
 	return 0;
 }
