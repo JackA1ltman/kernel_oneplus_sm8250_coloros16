@@ -116,8 +116,8 @@ int oplus_display_fix_apollo_level(void)
 			p_apollo_backlight->apollo_bl_list += sizeof(unsigned int)/sizeof(unsigned short);
 			p_apollo_backlight->panel_bl_list = p_apollo_backlight->apollo_bl_list + APOLLO_BL_4096;
 			p_apollo_backlight->bl_fix = true;
-		} else if (apollo_id[0] == APOLLO_BL_8192) {
-			p_apollo_backlight->bl_id_lens = APOLLO_BL_8192;
+		} else if(apollo_id[0] == APOLLO_BL_8192) {
+			p_apollo_backlight->bl_id_lens= APOLLO_BL_8192;
 			p_apollo_backlight->apollo_bl_list += sizeof(unsigned int)/sizeof(unsigned short);
 			p_apollo_backlight->panel_bl_list = p_apollo_backlight->apollo_bl_list + APOLLO_BL_8192;
 			p_apollo_backlight->bl_fix = true;
@@ -234,7 +234,7 @@ static int oplus_export_dmabuf(int buf_size)
 	int retcode = 0;
 	DEFINE_DMA_BUF_EXPORT_INFO(oplus_exp_info);
 	struct dma_buf *dmabuf = NULL;
-	unsigned long vaddr; /* alloc by kzalloc for dma map */
+	unsigned long vaddr; //alloc by kzalloc for dma map
 	char *bl_addr = NULL;
 	int page_order = 0;
 
@@ -260,10 +260,10 @@ static int oplus_export_dmabuf(int buf_size)
 		pr_err("%s alloc_pages fail\n", __func__);
 		goto err_dmabuf;
 	}
-	/* just for testi */
+	//just for test
 	bl_addr = (char *)vaddr;
 	sprintf(bl_addr, "dma test!");
-	/* just for test */
+	// just for test
 
 	oplus_exp_info.ops = &oplus_dmabuf_ops;
 	oplus_exp_info.size = page_order*PAGE_SIZE;
@@ -284,7 +284,7 @@ static int oplus_export_dmabuf(int buf_size)
 	p_apollo_backlight->panel_bl_list = (unsigned short *)(vaddr)
 		+ APOLLO_BACKLIGHT_LENS/sizeof(unsigned int);
 	p_apollo_backlight->bl_index_last = -1;
-	p_apollo_backlight->bl_level_last = -125; /* number for bl init leveli */
+	p_apollo_backlight->bl_level_last = -125; //number for bl init level
 	pr_debug("%s buf_size = %d bytes, p_panel_backlight = %p, vaddr = %p\n",
 		__func__, p_apollo_backlight->buf_size, p_apollo_backlight->panel_bl_list,
 		p_apollo_backlight->vaddr);
@@ -427,7 +427,7 @@ static const struct file_operations panel_ops =
 	.mmap               = panel_mmap,
 };
 
-static int __init oplus_display_panel_init()
+static int __init oplus_display_panel_init(void)
 {
 	int rc = 0;
 
@@ -476,7 +476,7 @@ err_class_create:
 	return rc;
 }
 
-void __exit oplus_display_panel_exit()
+static void __exit oplus_display_panel_exit(void)
 {
 	pr_info("%s\n", __func__);
 
