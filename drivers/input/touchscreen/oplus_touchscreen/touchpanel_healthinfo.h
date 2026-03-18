@@ -9,7 +9,7 @@
 #include <linux/i2c.h>
 #include <linux/firmware.h>
 
-#define LONG_SWIPE_JUDGE_RATIO      6
+#define LONG_SWIPE_JUDGE_RATIO      9
 
 #define SWIPE_BROKEN_FRAMES_MS      2500//2.5frams * 1000ms
 #define SWIPE_BROKEN_JUDGE_RATIO    35
@@ -78,14 +78,14 @@ typedef enum {
     HEALTH_BELOW_RATE,
 } healthinfo_type;
 
-static inline void reset_healthinfo_time_counter(u64 *time_counter) {}
-static inline void reset_healthinfo_grip_time_record(void *tp_monitor_data, void *tp_grip_info) {}
-static inline u64 check_healthinfo_time_counter_timeout(u64 time_counter, int ms) { return 0; }
+void reset_healthinfo_time_counter(u64 *time_counter);
+void reset_healthinfo_grip_time_record(void *tp_monitor_data, void *tp_grip_info);
+u64 check_healthinfo_time_counter_timeout(u64 time_counter, int ms);
 
-static inline int tp_healthinfo_report(void *tp_monitor_data, healthinfo_type type, void *value) { return 0; }
+int tp_healthinfo_report(void *tp_monitor_data, healthinfo_type type, void *value);
 
-static inline int tp_healthinfo_read(struct seq_file *s, void *tp_monitor_data) { return 0; }
+int tp_healthinfo_read(struct seq_file *s, void *tp_monitor_data);
 
-static inline int tp_healthinfo_init(struct device *dev, void *tp_monitor_data) { return 0; }
+int tp_healthinfo_init(struct device *dev, void *tp_monitor_data);
 
 #endif /* _TOUCHPANEL_HEALTHONFO_ */

@@ -61,12 +61,12 @@ enum APOLLO_BL_ID : int {
 };
 
 struct oplus_apollo_backlight_list {
-	bool bl_fix; /*for 4096/8192 fix*/
-	int bl_id_lens;    /*1 for 4096, 2 for 8192;*/
+	bool bl_fix; //for 4096/8192 fix
+	int bl_id_lens;    //1 for 4096, 2 for 8192;
 	int bl_level_last;
 	int bl_index_last;
 	int buf_size;
-	void *vaddr; /*dmabuf virtual address*/
+	void *vaddr; //dmabuf virtual address
 	unsigned short *apollo_bl_list;
 	unsigned short *panel_bl_list;
 	struct dma_buf *dmabuf;
@@ -74,8 +74,8 @@ struct oplus_apollo_backlight_list {
 
 struct apollo_backlight_map_value
 {
-	int index; /*backlight index*/
-	int bl_level; /*the value of the index*/
+	int index; //backlight index
+	int bl_level; //the value of the index
 	int apollo_bl_level;
 };
 struct panel_ioctl_desc {
