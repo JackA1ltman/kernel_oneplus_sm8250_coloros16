@@ -74,7 +74,7 @@ jobs:
           make CC="ccache clang" O=out ARCH=arm64 CLANG_TRIPLE=aarch64-linux-gnu- BRAND_SHOW_FLAG=oneplus NM=llvm-nm OBJDUMP=llvm-objdump STRIP=llvm-strip CROSS_COMPILE=$GITHUB_WORKSPACE/gcc-64/bin/aarch64-linux-android- CROSS_COMPILE_ARM32=$GITHUB_WORKSPACE/gcc-32/bin/arm-linux-androideabi- vendor/kona-perf_defconfig
           make -j$(nproc --all) CC="ccache clang" CLANG_TRIPLE=aarch64-linux-gnu- BRAND_SHOW_FLAG=oneplus NM=llvm-nm OBJDUMP=llvm-objdump STRIP=llvm-strip CROSS_COMPILE=$GITHUB_WORKSPACE/gcc-64/bin/aarch64-linux-android- CROSS_COMPILE_ARM32=$GITHUB_WORKSPACE/gcc-32/bin/arm-linux-androideabi- O=out ARCH=arm64 2>&1|tee error.log
 
-      - name: Make Anykernel3 Flasher
+      - name: Make Anykernel3 Flasher - NoDTB
         run: |
           TIME=$(date +"%Y%m%d%H%M%S")
 
@@ -98,9 +98,38 @@ jobs:
 
           echo "PACK_NAME=oneplus8-coloros16-$TIME-${{ matrix.name }}.zip" >> $GITHUB_ENV
 
+      - name: Make Anykernel3 Flasher - DTB
+        run: |
+          TIME=$(date +"%Y%m%d%H%M%S")
+
+          cd $GITHUB_WORKSPACE
+          mkdir -p tmp
+
+          sed -i 's/ExampleKernel by osm0sis @ xda-developers/NonGKI Kernel Build by JackAltman @ Github/g' Anykernel3/anykernel.sh
+          sed -i 's/do.devicecheck=1/do.devicecheck=0/g' Anykernel3/anykernel.sh
+          sed -i 's!BLOCK=/dev/block/platform/omap/omap_hsmmc.0/by-name/boot;!BLOCK=auto;!g' Anykernel3/anykernel.sh
+          sed -i 's/IS_SLOT_DEVICE=0;/is_slot_device=auto;/g' Anykernel3/anykernel.sh
+
+          cp -fp $GITHUB_WORKSPACE/out/arch/arm64/boot/Image tmp
+          echo "Found Image !"
+          cp -fp $GITHUB_WORKSPACE/out/arch/arm64/boot/DTB tmp
+          echo "Found DTB !"
+          cp -fp $GITHUB_WORKSPACE/out/arch/arm64/boot/dtbo.img tmp
+          echo "Found dtbo.img !"
+
+          cp -rp ./Anykernel3/* tmp
+          cd tmp
+          7za a -mx9 tmp.zip *
+          cd ..
+          cp -fp tmp/tmp.zip oneplus8-coloros16-$TIME-${{ matrix.name }}-DTB.zip
+          rm -rf tmp
+
+          echo "PACK_NAME_DTB=oneplus8-coloros16-$TIME-${{ matrix.name }}-DTB.zip" >> $GITHUB_ENV
+
       - name: Upload Build Artifacts For Anykernel3
         uses: actions/upload-artifact@v4
         with:
           name: Kernel-${{ matrix.name }}
           path: |
-            $GITHUB_WORKSPACE/${{ env.PACK_NAME }}
+            ${{ env.PACK_NAME }}
+            ${{ env.PACK_NAME_DTB }}
