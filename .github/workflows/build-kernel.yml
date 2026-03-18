@@ -55,6 +55,12 @@ jobs:
           #tar -C clang-custom/ -xf clang-custom.tar.xz --strip-components 1
           git clone https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b.git clang-custom
 
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: build-kernel
+          max-size: 2G
+
       - name: Get Kernel
         run: |
           cd $GITHUB_WORKSPACE
