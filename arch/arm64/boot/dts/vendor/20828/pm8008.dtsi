@@ -74,7 +74,7 @@ pm8008_9: qcom,pm8008@9 {
 		};
 
 		L2P: qcom,pm8008-l2@4100 {
-			reg = /bits/ 16 <0x4100>;
+			reg = <0x4100>;
 			//#else
 			//reg = <0x4100>;
 			//#endif
@@ -86,7 +86,7 @@ pm8008_9: qcom,pm8008@9 {
 		};
 
 		L3P: qcom,pm8008-l3@4200 {
-			reg = /bits/ 16 <0x4200>;
+			reg = <0x4200>;
 			//#else
 			//reg = <0x4200>;
 			//#endif
@@ -98,7 +98,7 @@ pm8008_9: qcom,pm8008@9 {
 		};
 
 		L4P: qcom,pm8008-l4@4300 {
-			reg = /bits/ 16 <0x4300>;
+			reg = <0x4300>;
 			//#else
 			//reg = <0x4300>;
 			//#endif
@@ -110,7 +110,7 @@ pm8008_9: qcom,pm8008@9 {
 		};
 
 		L5P: qcom,pm8008-l5@4400 {
-			reg = /bits/ 16 <0x4400>;
+			reg = <0x4400>;
 			//#else
 			//reg = <0x4400>;
 			//#endif
@@ -122,7 +122,7 @@ pm8008_9: qcom,pm8008@9 {
 		};
 
 		L6P: qcom,pm8008-l6@4400 {
-			reg = /bits/ 16 <0x4500>;
+			reg = <0x4500>;
 			//#else
 			//reg = <0x4500>;
 			//#endif
@@ -134,7 +134,7 @@ pm8008_9: qcom,pm8008@9 {
 		};
 
 		L7P: qcom,pm8008-l7@4400 {
-			reg = /bits/ 16 <0x4600>;
+			reg = <0x4600>;
 			//#else
 			//reg = <0x4600>;
 			//#endif

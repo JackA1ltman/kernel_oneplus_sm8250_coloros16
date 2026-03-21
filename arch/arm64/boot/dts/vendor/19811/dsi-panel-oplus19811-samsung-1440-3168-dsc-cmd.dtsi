@@ -1,5 +1,5 @@
 &mdss_mdp {
-	dsi_oplus19811_samsung_1440_3168_dsc_cmd: qcom,mdss_dsi_oplus19811_samsung_1440_3168_dsc_cmd {
+	dsi_oplus19811_samsung_1440_3168_dsc_cmd: qcom,mdss_dsi_oppo19811_samsung_1440_3168_dsc_cmd {
 		qcom,mdss-dsi-panel-name = "samsung AMS678UW01 qhd panel";
 		oplus,mdss-dsi-vendor-name = "ANA6706";
 		oplus,mdss-dsi-manufacture = "samsung1024";
@@ -2104,9 +2104,9 @@
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
 	qcom,mdss-dsi-bl-normal-max-level = <2047>;
-	qcom,mdss-dsi-bl-max-level = <4095>;
+	qcom,mdss-dsi-bl-max-level = <2047>;
 	qcom,mdss-brightness-normal-max-level = <2047>;
-	qcom,mdss-brightness-max-level = <4095>;
+	qcom,mdss-brightness-max-level = <2047>;
 	qcom,mdss-brightness-default-level = <400>;
 	qcom,platform-te-gpio = <&tlmm 66 0>;
 	qcom,platform-reset-gpio = <&tlmm 75 0>;
