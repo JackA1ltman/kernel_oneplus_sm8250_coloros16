@@ -209,7 +209,6 @@
 				];
 				qcom,mdss-dsi-lp1-command = [
 					/* 50nit */
-					05 01 00 00 25 00 01 28
 					39 01 00 00 11 00 03 F0 5A 5A
 					15 01 00 00 00 00 02 60 00
 					15 01 00 00 00 00 02 B0 0B
@@ -505,7 +504,6 @@
 				];
 				qcom,mdss-dsi-lp1-command = [
 					/* 50nit */
-					05 01 00 00 25 00 01 28
 					39 01 00 00 00 00 03 F0 5A 5A
 					15 01 00 00 00 00 02 60 00
 					15 01 00 00 00 00 02 B0 0B
@@ -688,6 +686,9 @@
 	oplus,mdss-dsi-manufacture = "samsung1024";
 	oplus,color_vivid_status;
 	oplus,color_srgb_status;
+	oplus,dp-support-customized;
+	oplus,is-oplus-project;
+	oplus,aod_on_fod_off;
 
 	oplus,dsi-fod-brightness = <0 0xff>,
 				<2 0xf1>,

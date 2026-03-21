@@ -93,12 +93,7 @@
 			snps,usb3-u1u2-disable;
 			usb-core-id = <0>;
 			tx-fifo-resize;
-			/*#ifdef OPLUS_FEATURE_CHG_BASIC*/
-			/* Modify for otg usb storage */
-			maximum-speed = "super-speed";
-			/*#else*/
-			/*maximum-speed = "super-speed-plus";*/
-			/*#endif*/
+			maximum-speed = "super-speed-plus";
 			dr_mode = "drd";
 		};
 
