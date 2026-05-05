@@ -39,6 +39,7 @@
 		qcom,mdss-dsi-panel-hdr-color-primaries =
 				<15000 15500 34000 16000 13250 34500 7500 3000>;
 		qcom,mdss-dsi-panel-peak-brightness = <4300000>;
+		qcom,mdss-dsi-panel-average-brightness = <2000000>;
 		qcom,mdss-dsi-panel-blackness-level = <1023>;
 		qcom,mdss-pan-physical-width-dimension = <68>;
 		qcom,mdss-pan-physical-height-dimension = <152>;
@@ -57,6 +58,8 @@
 			0x80 0x80 0x9C
 		>;
 		qcom,mdss-dsi-panel-status-read-length = <1 1 1>;
+		qcom,dynamic-mode-switch-enabled;
+		qcom,dynamic-mode-switch-type = "dynamic-resolution-switch-immediate";
 
 		qcom,mdss-dsi-display-timings {
 			timing@0 {
@@ -644,6 +647,7 @@
 	oplus,mdss-dsi-vendor-name = "AMB655UV01";
 	oplus,mdss-dsi-manufacture = "samsung1024";
 	oplus,dp-support-customized;
+	oplus,is-oplus-project;
 
 	oplus,dsi-fod-brightness = <0 0xff>,
 				   <2 0xf1>,
@@ -666,6 +670,33 @@
 				   <1600 64>,
 				   <2047 43>,
 				   <2047 43>;
+
+	/*
+	 * Keep DC parsing alive for Oplus private display paths. This table is
+	 * intentionally conservative and mirrors the in-kernel fallback curve so
+	 * we can validate whether missing DC config is what breaks HDR behavior.
+	 */
+	oplus,dsi-dc-brightness = <0 0xff>,
+				  <1 0xE0>,
+				  <2 0xd1>,
+				  <3 0xd0>,
+				  <4 0xcf>,
+				  <5 0xc9>,
+				  <6 0xc7>,
+				  <8 0xbe>,
+				  <10 0xb6>,
+				  <15 0xaa>,
+				  <20 0x9c>,
+				  <30 0x92>,
+				  <45 0x7c>,
+				  <70 0x5c>,
+				  <100 0x40>,
+				  <120 0x2c>,
+				  <140 0x20>,
+				  <160 0x1c>,
+				  <180 0x16>,
+				  <200 0x08>,
+				  <223 0x00>;
 
 	oplus,dsi-aod-high-brightness = <0 255>,
 					<17 185>,
