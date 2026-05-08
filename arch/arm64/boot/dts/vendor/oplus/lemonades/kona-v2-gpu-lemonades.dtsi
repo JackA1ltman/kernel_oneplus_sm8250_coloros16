@@ -1,0 +1,139 @@
+&soc {
+	msm_bus: qcom,kgsl-busmon {
+		label = "kgsl-busmon";
+		compatible = "qcom,kgsl-busmon";
+		operating-points-v2 = <&gpu_opp_table_v2>;
+	};
+
+	gpu_opp_table_v2: gpu-opp-table_v2 {
+		compatible = "operating-points-v2";
+
+		opp-650000000 {
+			opp-hz = /bits/ 64 <650000000>;
+			opp-microvolt = <190>;
+		};
+
+		opp-600000000 {
+			opp-hz = /bits/ 64 <600000000>;
+			opp-microvolt = <130>;
+		};
+
+		opp-500000000 {
+			opp-hz = /bits/ 64 <500000000>;
+			opp-microvolt = <70>;
+		};
+
+		opp-400000000 {
+			opp-hz = /bits/ 64 <400000000>;
+			opp-microvolt = <5>;
+		};
+
+		opp-200000000 {
+			opp-hz = /bits/ 64 <200000000>;
+			opp-microvolt = <2>;
+		};
+	};
+};
+
+&msm_gpu {
+	qcom,chipid = <0x06050001>;
+
+	/* GPU OPP data */
+	operating-points-v2 = <&gpu_opp_table_v2>;
+
+	/delete-property/qcom,initial-pwrlevel;
+	/delete-node/qcom,gpu-pwrlevels;
+
+	/* Power levels bins */
+	qcom,gpu-pwrlevel-bins {
+		compatible="qcom,gpu-pwrlevel-bins";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		qcom,gpu-pwrlevels-0 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			qcom,speed-bin = <0>;
+			qcom,initial-pwrlevel = <6>;
+			qcom,throttle-pwrlevel = <0>;
+
+			qcom,gpu-pwrlevel@0 {
+				reg = <2>;
+				qcom,gpu-freq = <650000000>;
+				qcom,bus-freq-ddr7 = <5>;
+				qcom,bus-min-ddr7 = <1>;
+				qcom,bus-max-ddr7 = <8>;
+
+				qcom,bus-freq-ddr8 = <5>;
+				qcom,bus-min-ddr8 = <1>;
+				qcom,bus-max-ddr8 = <8>;
+
+				qcom,acd-level = <0x802b5ffd>;
+			};
+
+			qcom,gpu-pwrlevel@1 {
+				reg = <3>;
+				qcom,gpu-freq = <600000000>;
+				qcom,bus-freq-ddr7 = <5>;
+				qcom,bus-min-ddr7 = <1>;
+				qcom,bus-max-ddr7 = <8>;
+
+				qcom,bus-freq-ddr8 = <5>;
+				qcom,bus-min-ddr8 = <1>;
+				qcom,bus-max-ddr8 = <8>;
+
+				qcom,acd-level = <0x802b5ffd>;
+			};
+
+			qcom,gpu-pwrlevel@2 {
+				reg = <4>;
+				qcom,gpu-freq = <500000000>;
+				qcom,bus-freq-ddr7 = <3>;
+				qcom,bus-min-ddr7 = <1>;
+				qcom,bus-max-ddr7 = <6>;
+
+				qcom,bus-freq-ddr8 = <3>;
+				qcom,bus-min-ddr8 = <1>;
+				qcom,bus-max-ddr8 = <6>;
+
+				qcom,acd-level = <0x802b5ffd>;
+			};
+
+			qcom,gpu-pwrlevel@3 {
+				reg = <5>;
+				qcom,gpu-freq = <400000000>;
+				qcom,bus-freq-ddr7 = <2>;
+				qcom,bus-min-ddr7 = <1>;
+				qcom,bus-max-ddr7 = <4>;
+
+				qcom,bus-freq-ddr8 = <2>;
+				qcom,bus-min-ddr8 = <1>;
+				qcom,bus-max-ddr8 = <4>;
+
+				qcom,acd-level = <0x802b5ffd>;
+			};
+
+			qcom,gpu-pwrlevel@4 {
+				reg = <6>;
+				qcom,gpu-freq = <200000000>;
+				qcom,bus-freq-ddr7 = <1>;
+				qcom,bus-min-ddr7 = <1>;
+				qcom,bus-max-ddr7 = <2>;
+
+				qcom,bus-freq-ddr8 = <1>;
+				qcom,bus-min-ddr8 = <1>;
+				qcom,bus-max-ddr8 = <2>;
+
+				qcom,acd-level = <0x802b5ffd>;
+			};
+
+			qcom,gpu-pwrlevel@5 {
+				reg = <7>;
+				qcom,gpu-freq = <0>;
+				qcom,bus-freq = <0>;
+				qcom,bus-min = <0>;
+				qcom,bus-max = <0>;
+			};
+		};
+	};
+};
