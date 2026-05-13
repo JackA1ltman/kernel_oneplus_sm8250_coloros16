@@ -1,0 +1,312 @@
+/* Oppo-specific device tree overrides on top of qcom/kona.dtsi */
+
+#include <dt-bindings/clock/qcom,aop-qmp.h>
+#include <dt-bindings/clock/qcom,camcc-kona.h>
+#include <dt-bindings/clock/qcom,cpucc-kona.h>
+#include <dt-bindings/clock/qcom,dispcc-kona.h>
+#include <dt-bindings/clock/qcom,gcc-kona.h>
+#include <dt-bindings/clock/qcom,gpucc-kona.h>
+#include <dt-bindings/clock/qcom,npucc-kona.h>
+#include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/clock/qcom,videocc-kona.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/msm/msm-bus-ids.h>
+#include <dt-bindings/regulator/qcom,rpmh-regulator-levels.h>
+#include <dt-bindings/soc/qcom,ipcc.h>
+#include <dt-bindings/soc/qcom,dcc_v2.h>
+#include <dt-bindings/soc/qcom,rpmh-rsc.h>
+#include <dt-bindings/spmi/spmi.h>
+#include <dt-bindings/gpio/gpio.h>
+
+#define MHZ_TO_MBPS(mhz, w) ((mhz * 1000000 * w) / (1024 * 1024))
+#define BW_OPP_ENTRY(mhz, w) opp-mhz {opp-hz = /bits/ 64 <MHZ_TO_MBPS(mhz, w)>;}
+
+#define BW_OPP_ENTRY_DDR(mhz, w, ddrtype) opp-mhz {\
+				opp-hz = /bits/ 64 <MHZ_TO_MBPS(mhz, w)>;\
+				opp-supported-hw = <ddrtype>;}
+
+#define DDR_TYPE_LPDDR4X	7
+#define DDR_TYPE_LPDDR5		8
+
+/ {
+	mem-offline {
+		compatible = "qcom,mem-offline";
+		offline-sizes = <0x1 0x40000000 0x0 0x40000000>,
+				<0x1 0xc0000000 0x0 0x80000000>,
+				<0x2 0xc0000000 0x1 0x40000000>;
+		granule = <512>;
+		mboxes = <&qmp_aop 0>;
+	};
+
+	aliases {
+		/* #ifdef OPLUS_ARCH_EXTENDS */
+		i2c2 = &qupv3_se15_i2c;
+		/* #endif OPLUS_ARCH_EXTENDS */
+	};
+
+	chosen {
+		bootargs = "rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kasan_multi_shot";
+
+		bootloader_quirk {
+			parts = "vbmeta,boot,system,vendor,dtbo,recovery";
+			vbmeta {
+				fsmgr_flags = "wait,avb";
+			};
+		};
+	};
+
+	reserved-memory {
+		kboot_uboot_logmem: kboot_uboot_logmem@0x9FE00000 {
+			reg = <0x0 0x9FE00000 0x0 0x200000>;
+			compatible = "oplus,xbl_uefi_kbootlog";
+			xbluefi-offset = <0x1F7000>;
+			no-map;
+		};
+
+		disp_rdump_memory: disp_rdump_region@9c000000 {
+			reg = <0x0 0x9c000000 0x0 0x00800000>;
+			label = "disp_rdump_region";
+		};
+
+		ramoops: ramoops@0xB0000000 {
+			compatible = "ramoops";
+			reg = <0 0xB0000000 0 0x00400000>;
+			record-size =  <0x40000>;
+			console-size = <0x40000>;
+			ftrace-size =  <0x40000>;
+			pmsg-size=         <0x200000>;
+			devinfo-size=  <0x01000>;
+			ecc-size=          <0x0>;
+		};
+	};
+
+	midas_pdev {
+		compatible = "oplus,midas-pdev";
+	};
+};
+
+&jtag_mm0 {
+	status = "ok";
+};
+
+&jtag_mm1 {
+	status = "ok";
+};
+
+&jtag_mm2 {
+	status = "ok";
+};
+
+&jtag_mm3 {
+	status = "ok";
+};
+
+&jtag_mm4 {
+	status = "ok";
+};
+
+&jtag_mm5 {
+	status = "ok";
+};
+
+&jtag_mm6 {
+	status = "ok";
+};
+
+&wdog {
+	qcom,bark-time = <22000>;
+};
+
+&clock_aop {
+	/delete-property/ qcom,clk-stop-bimc-log;
+};
+
+&ufs_phy_gdsc {
+	/delete-property/ qcom,gds-timeout;
+};
+
+&gpu_gx_gdsc {
+	/delete-property/ qcom,skip-disable-before-sw-enable;
+};
+
+&pil_camera_mem {
+	reg = <0x0 0x8dc00000 0x0 0x500000>;
+};
+
+&pil_wlan_fw_mem {
+	reg = <0x0 0x8e100000 0x0 0x100000>;
+};
+
+&pil_ipa_fw_mem {
+	reg = <0x0 0x8e200000 0x0 0x10000>;
+};
+
+&pil_ipa_gsi_mem {
+	reg = <0x0 0x8e210000 0x0 0xa000>;
+};
+
+&pil_gpu_mem {
+	reg = <0x0 0x8e21a000 0x0 0x2000>;
+};
+
+&pil_npu_mem {
+	reg = <0x0 0x8e300000 0x0 0x500000>;
+};
+
+&pil_video_mem {
+	reg = <0x0 0x8e800000 0x0 0x500000>;
+};
+
+&pil_cvp_mem {
+	reg = <0x0 0x8ed00000 0x0 0x500000>;
+};
+
+&pil_cdsp_mem {
+	reg = <0x0 0x8f200000 0x0 0x1400000>;
+};
+
+&pil_slpi_mem {
+	reg = <0x0 0x90600000 0x0 0x1500000>;
+};
+
+&pil_adsp_mem {
+	reg = <0x0 0x91b00000 0x0 0x2500000>;
+};
+
+&pil_spss_mem {
+	reg = <0x0 0x94000000 0x0 0x100000>;
+};
+
+&cdsp_secure_heap {
+	reg = <0x0 0x94100000 0x0 0x4600000>;
+};
+
+&qseecom_ta_mem {
+	reg = <0x82400000 0xb400000>;
+};
+
+&cnss_wlan_mem {
+	size = <0x0 0x1C00000>;
+};
+
+&qcom_seecom {
+	qcom,pil-addr = <0x94000000>;
+};
+
+&sdhc_2 {
+	vdd-supply = <&pm8150a_l10>;
+	vddio-supply = <&pm8150a_l8>;
+};
+
+&cnss_pci {
+	/delete-property/ qcom,sw-ctrl-gpio;
+	/delete-property/ qcom,converged-dt;
+	/delete-property/ qcom,cmd_db_name;
+	use-nv-mac;
+};
+
+&wlan {
+	/delete-property/ vdd-wlan-dig-supply;
+	/delete-property/ qcom,vdd-wlan-dig-config;
+	/delete-property/ wlan-ant-switch-supply;
+	/delete-property/ qcom,wlan-ant-switch-config;
+};
+
+&qfprom {
+	reg = <0x00784000 0x3000>;
+};
+
+&gpu_lm_efuse {
+	reg = <0x5c8 0x4>;
+};
+
+&gpu_speed_bin {
+	reg = <0x19b 0x1>;
+};
+
+/* CPU4-6 capacity override (qcom v2 base uses 1022) */
+&CPU4 {
+	capacity-dmips-mhz = <1024>;
+};
+
+&CPU5 {
+	capacity-dmips-mhz = <1024>;
+};
+
+&CPU6 {
+	capacity-dmips-mhz = <1024>;
+};
+
+/* Oppo-specific subsystem includes (overrides on top of qcom base) */
+#include "kona-oppo-regulators.dtsi"
+#include "kona-oppo-pcie.dtsi"
+#include "kona-oppo-pinctrl.dtsi"
+#include "kona-oppo-usb.dtsi"
+#include "../qcom/kona-coresight.dtsi"
+#include "kona-oppo-sde.dtsi"
+#include "kona-oppo-camera.dtsi"
+#include "kona-oppo-qupv3.dtsi"
+#include "kona-oppo-audio.dtsi"
+#include "kona-oppo-thermal.dtsi"
+#include "kona-oppo-cvp.dtsi"
+#include "kona-oppo-gpu.dtsi"
+
+&qupv3_se2_i2c {
+	status = "ok";
+	#include "kona-oppo-pm8008.dtsi"
+};
+
+&pm8008_8 {
+	interrupt-parent = <&tlmm>;
+	interrupts = <63 IRQ_TYPE_EDGE_RISING>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pm8008_active &pm8008_interrupt>;
+};
+
+&pm8008_regulators {
+	vdd_l1_l2-supply = <&S8C>;
+	vdd_l3_l4-supply = <&BOB>;
+	vdd_l5-supply = <&S5A>;
+	vdd_l6-supply = <&BOB>;
+	vdd_l7-supply = <&BOB>;
+};
+
+&L1P {
+	regulator-min-microvolt = <1050000>;
+	regulator-max-microvolt = <1100000>;
+	qcom,min-dropout-voltage = <10000>;
+};
+
+&L2P {
+	regulator-min-microvolt = <1200000>;
+	regulator-max-microvolt = <1200000>;
+	qcom,min-dropout-voltage = <10000>;
+};
+
+&L3P {
+	regulator-min-microvolt = <2800000>;
+	regulator-max-microvolt = <2900000>;
+	qcom,min-dropout-voltage = <136000>;
+};
+
+&L4P {
+	regulator-min-microvolt = <1800000>;
+	regulator-max-microvolt = <1800000>;
+	qcom,min-dropout-voltage = <160000>;
+};
+
+&L5P {
+	regulator-min-microvolt = <1800000>;
+	regulator-max-microvolt = <1800000>;
+	qcom,min-dropout-voltage = <100000>;
+};
+
+&L6P {
+	regulator-max-microvolt = <2800000>;
+	qcom,min-dropout-voltage = <10000>;
+};
+
+&L7P {
+	regulator-max-microvolt = <2900000>;
+	qcom,min-dropout-voltage = <10000>;
+};
