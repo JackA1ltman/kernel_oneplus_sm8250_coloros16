@@ -71,11 +71,21 @@ static int sec_enable_black_gesture(struct chip_data_s6sy771 *chip_info, bool en
 {
     int ret = 0;
     int i = 0;
+    bool single_tap_support_a = false;
+    struct touchpanel_data *ts = i2c_get_clientdata(chip_info->client);
 
-    TPD_INFO("%s, enable = %d\n", __func__, enable);
+    if (ts)
+        single_tap_support_a = ts->single_tap_support;
+
+    TPD_INFO("%s, enable = %d, single_tap_support = %d\n", __func__, enable, single_tap_support_a);
 
     if (enable) {
-        touch_i2c_write_word(chip_info->client, SEC_CMD_WAKEUP_GESTURE_MODE, 0xFF1F);
+        /*
+         * Single tap needs the bits 0xFF1F clears, so write the full mask
+         * when the panel/DT asks for it (same as the public OPLUS tree).
+         */
+        touch_i2c_write_word(chip_info->client, SEC_CMD_WAKEUP_GESTURE_MODE,
+                             single_tap_support_a ? 0xFFFF : 0xFF1F);
         for (i = 0; i < 20; i++) {
             touch_i2c_write_byte(chip_info->client, SEC_CMD_SET_POWER_MODE, 0x01);
             sec_mdelay(10);
@@ -125,12 +135,18 @@ static void sec_enable_gesture_mask(void *chip_data, uint32_t enable)
     struct chip_data_s6sy771 *chip_info = (struct chip_data_s6sy771 *)chip_data;
     int ret = -1;
     int i = 0;
+    bool single_tap_support_a = false;
+    struct touchpanel_data *ts = i2c_get_clientdata(chip_info->client);
 
-    TPD_INFO("%s, enable = %d\n", __func__, enable);
+    if (ts)
+        single_tap_support_a = ts->single_tap_support;
+
+    TPD_INFO("%s, enable = %d, single_tap_support = %d\n", __func__, enable, single_tap_support_a);
 
     if (enable) {
         for (i = 0; i < 20; i++) {
-            touch_i2c_write_word(chip_info->client, SEC_CMD_WAKEUP_GESTURE_MODE, 0xFF1F);
+            touch_i2c_write_word(chip_info->client, SEC_CMD_WAKEUP_GESTURE_MODE,
+                                 single_tap_support_a ? 0xFFFF : 0xFF1F);
             touch_i2c_write_byte(chip_info->client, SEC_CMD_SET_POWER_MODE, 0x01);
             sec_mdelay(10);
             ret = touch_i2c_read_byte(chip_info->client, SEC_CMD_SET_POWER_MODE);
