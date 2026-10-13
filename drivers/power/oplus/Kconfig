@@ -61,19 +61,19 @@ config OPLUS_SMART_CHARGER_SUPPORT
 	  Say Y to include support
 
 config OPLUS_RTC_DET_SUPPORT
-	bool "OPLUS RTC DET SUPPORT"
+	tristate "OPLUS RTC DET SUPPORT"
 	default n
 	help
 	  Say Y to include support
 
 config OPLUS_CHECK_CHARGERID_VOLT
-	bool "OPLUS CHECK CHARGERID VOLT"
+	tristate "OPLUS CHECK CHARGERID VOLT"
 	default n
 	help
 	  Say Y to include support
 
 config OPLUS_SHIP_MODE_SUPPORT
-	bool "OPLUS_SHIP_MODE_SUPPORT"
+	tristate "OPLUS_SHIP_MODE_SUPPORT"
 	default n
 	help
 	  Say Y to include support
@@ -102,7 +102,7 @@ config OPLUS_CHARGER_MTK6833
 	  Set No to disable OPLUS_CHARGER_MTK6833 features
 	  smart battery.
 config OPLUS_SHORT_HW_CHECK
-	bool "OPLUS batt HW SHORT "
+	tristate "OPLUS batt HW SHORT "
 	help
 	  Say Y here to declare charging system is on MTK
 
