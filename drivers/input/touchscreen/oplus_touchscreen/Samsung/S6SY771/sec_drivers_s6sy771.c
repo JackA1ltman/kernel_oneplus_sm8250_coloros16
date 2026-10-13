@@ -1289,16 +1289,25 @@ static int sec_get_gesture_info(void *chip_data, struct gesture_info *gesture)
 {
     int i = 0, ret = -1;
     uint8_t coord[18] = {0};
+    bool ear_sense_support_a = false;
     struct Coordinate limitPoint[4];
     struct sec_gesture_status *p_event_gesture = NULL;
     struct chip_data_s6sy771 *chip_info = (struct chip_data_s6sy771 *)chip_data;
+    struct touchpanel_data *ts = i2c_get_clientdata(chip_info->client);
+
+    if (ts)
+        ear_sense_support_a = ts->ear_sense_support;
 
     p_event_gesture = (struct sec_gesture_status *)chip_info->first_event;
     if (p_event_gesture->coordLen > 18) {
         p_event_gesture->coordLen = 18;
     }
 
-    if (p_event_gesture->gestureId == GESTURE_EARSENSE) {
+    /*
+     * 0x0E means "earsense" only when the panel supports it; otherwise the IC
+     * uses the same id for a single tap, which has to reach the decode below.
+     */
+    if ((p_event_gesture->gestureId == GESTURE_EARSENSE) && ear_sense_support_a) {
         TPD_DETAIL("earsense gesture: away from panel\n");
         return 0;
     }
@@ -1315,6 +1324,12 @@ static int sec_get_gesture_info(void *chip_data, struct gesture_info *gesture)
     }
 
     switch (p_event_gesture->gestureId) {   //judge gesture type
+    case GESTURE_SINGLE_TAP:
+        gesture->gesture_type  = SingleTap;
+        gesture->Point_start.x = (coord[0] << 4) | ((coord[2] >> 4) & 0x0F);
+        gesture->Point_start.y = (coord[1] << 4) | ((coord[2] >> 0) & 0x0F);
+        break;
+
     case GESTURE_RIGHT:
         gesture->gesture_type  = Left2RightSwip;
         gesture->Point_start.x = (coord[0] << 4) | ((coord[2] >> 4) & 0x0F);

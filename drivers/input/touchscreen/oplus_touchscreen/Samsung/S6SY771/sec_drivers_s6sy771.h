@@ -29,6 +29,11 @@
 #define GESTURE_W                               0x0B
 #define GESTURE_DOUBLE_LINE                     0x0C
 #define GESTURE_EARSENSE                        0x0E
+/*
+ * The IC uses 0x0E for a single tap as well.  It means "earsense" only when
+ * the panel supports earsense, see sec_get_gesture_info().
+ */
+#define GESTURE_SINGLE_TAP                      0x0E
 
 #define RESET_TO_NORMAL_TIME                    (70)
 #define SEC_EVENT_BUFF_SIZE                     8
