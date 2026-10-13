@@ -143,8 +143,8 @@ int __add_to_swap_cache(struct page *page, swp_entry_t entry, void **shadowp)
 			break;
 		}
 
-		error = radix_tree_insert(&address_space->i_pages, idx + i,
-					  page + i);
+		error = xa_err(__xa_store(&address_space->i_pages, idx + i,
+					  page + i, GFP_ATOMIC));
 		if (unlikely(error))
 			break;
 
