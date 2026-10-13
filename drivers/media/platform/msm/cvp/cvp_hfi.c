@@ -349,6 +349,7 @@ int get_pkt_index(struct cvp_hal_session_cmd_pkt *hdr)
 
 	return -EINVAL;
 }
+
 #ifndef OPLUS_FEATURE_CAMERA_COMMON
 int set_feature_bitmask(int pkt_idx, unsigned long *bitmask)
 {
@@ -376,6 +377,7 @@ int set_feature_bitmask(int pkt_idx, unsigned long *bitmask)
 	return -EINVAL;
 }
 #endif
+
 int get_hfi_version(void)
 {
 	struct msm_cvp_core *core;
@@ -827,8 +829,8 @@ static int __read_queue(struct cvp_iface_q_info *qinfo, u8 *packet,
 		mb();
 #ifdef OPLUS_FEATURE_CAMERA_COMMON
 		*pb_tx_req_is_set = 1;
-		if(write_idx != queue->qhdr_write_idx) {
-				queue->qhdr_rx_req = 0;
+		if (write_idx != queue->qhdr_write_idx) {
+			queue->qhdr_rx_req = 0;
 		}
 		else {
 				spin_unlock(&qinfo->hfi_lock);

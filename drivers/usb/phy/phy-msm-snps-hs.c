@@ -370,9 +370,8 @@ static void hsusb_phy_write_seq(void __iomem *base, u32 *seq, int cnt,
 
 #ifdef OPLUS_FEATURE_CHG_BASIC
 static void hsusb_phy_read_seq(void __iomem *base, u32 *seq, int cnt,
-		unsigned long delay)
+			       unsigned long delay)
 {
-	///int i;
 	u32 tmp = 0;
 
 	pr_debug(" hsusb_phy_read_seq Seq count:%d\n", cnt);
@@ -440,27 +439,24 @@ static int msm_hsphy_init(struct usb_phy *uphy)
 	msm_usb_write_readback(phy->base, USB2_PHY_USB_PHY_HS_PHY_CTRL1,
 				VBUSVLDEXT0, VBUSVLDEXT0);
 
-#ifdef OPLUS_FEATURE_CHG_BASIC
-        if((phy->phy.flags & PHY_HOST_MODE)&&(phy->param_override_seq_host)) {
 	/* set parameter ovrride  if needed */
-		pr_info("%s: override phy host mode\n");
-#else
-        if (phy->param_override_seq)
-			hsusb_phy_write_seq(phy->base, phy->param_override_seq,
-				phy->param_override_seq_cnt, 0);
-#endif
-
 #ifdef OPLUS_FEATURE_CHG_BASIC
-			hsusb_phy_write_seq(phy->base, phy->param_override_seq_host,
-				phy->param_override_seq_cnt_host, 0);
-        }
-        else{
-		    if (phy->param_override_seq) {
-				pr_info("%s: override phy device mode\n");
-				hsusb_phy_write_seq(phy->base, phy->param_override_seq,
-					phy->param_override_seq_cnt, 0);
-			}
-        }
+	if ((phy->phy.flags & PHY_HOST_MODE) &&
+	    (phy->param_override_seq_host)) {
+		pr_info("%s: override phy host mode\n");
+		hsusb_phy_write_seq(phy->base, phy->param_override_seq_host,
+				    phy->param_override_seq_cnt_host, 0);
+	} else {
+		if (phy->param_override_seq) {
+			pr_info("%s: override phy device mode\n");
+			hsusb_phy_write_seq(phy->base, phy->param_override_seq,
+					    phy->param_override_seq_cnt, 0);
+		}
+	}
+#else
+	if (phy->param_override_seq)
+		hsusb_phy_write_seq(phy->base, phy->param_override_seq,
+				phy->param_override_seq_cnt, 0);
 #endif
 
 	if (phy->pre_emphasis) {
@@ -567,7 +563,7 @@ static int msm_hsphy_init(struct usb_phy *uphy)
 
 #ifdef OPLUS_FEATURE_CHG_BASIC
 	hsusb_phy_read_seq(phy->base, phy->param_override_seq,
-				phy->param_override_seq_cnt, 0);
+			   phy->param_override_seq_cnt, 0);
 	pr_debug("hsusb_phy_read_seq again  end\n");
 #endif
 	return 0;
@@ -940,14 +936,12 @@ static int msm_hsphy_probe(struct platform_device *pdev)
 
 #ifdef OPLUS_FEATURE_CHG_BASIC
 	phy->param_override_seq_cnt_host = of_property_count_elems_of_size(
-					dev->of_node,
-					"qcom,param-override-seq-host",
-					sizeof(*phy->param_override_seq_host));
+		dev->of_node, "qcom,param-override-seq-host",
+		sizeof(*phy->param_override_seq_host));
 	if (phy->param_override_seq_cnt_host > 0) {
-		phy->param_override_seq_host = devm_kcalloc(dev,
-					phy->param_override_seq_cnt_host,
-					sizeof(*phy->param_override_seq_host),
-					GFP_KERNEL);
+		phy->param_override_seq_host = devm_kcalloc(
+			dev, phy->param_override_seq_cnt_host,
+			sizeof(*phy->param_override_seq_host), GFP_KERNEL);
 		if (!phy->param_override_seq_host)
 			return -ENOMEM;
 
@@ -956,12 +950,13 @@ static int msm_hsphy_probe(struct platform_device *pdev)
 			return -EINVAL;
 		}
 
-		ret = of_property_read_u32_array(dev->of_node,
-				"qcom,param-override-seq-host",
-				phy->param_override_seq_host,
-				phy->param_override_seq_cnt_host);
+		ret = of_property_read_u32_array(
+			dev->of_node, "qcom,param-override-seq-host",
+			phy->param_override_seq_host,
+			phy->param_override_seq_cnt_host);
 		if (ret) {
-			dev_err(dev, "qcom,param-override-seq-host read failed %d\n",
+			dev_err(dev,
+				"qcom,param-override-seq-host read failed %d\n",
 				ret);
 			return ret;
 		}

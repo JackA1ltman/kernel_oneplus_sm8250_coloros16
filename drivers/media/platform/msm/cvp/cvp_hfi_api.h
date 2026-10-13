@@ -105,6 +105,7 @@
 #define ICA_BIT_OFFSET (CVP_KMD_HFI_ICA_FRAME_CMD - CVP_KMD_CMD_START)
 #define FD_BIT_OFFSET (CVP_KMD_HFI_FD_FRAME_CMD - CVP_KMD_CMD_START)
 #endif
+
 #define HFI_VERSION_MAJOR_MASK 0xFF000000
 #define HFI_VERSION_MAJOR_SHFIT 24
 #define HFI_VERSION_MINOR_MASK 0x00FFFFE0
@@ -417,8 +418,7 @@ struct cvp_hfi_device {
 	int (*validate_session)(void *sess, const char *func);
 };
 
-typedef void (*hfi_cmd_response_callback) (enum hal_command_response cmd,
-			void *data);
+typedef void (*hfi_cmd_response_callback) (u32 cmd, void *data);
 typedef void (*msm_cvp_callback) (u32 response, void *callback);
 
 struct cvp_hfi_device *cvp_hfi_initialize(enum msm_cvp_hfi_type hfi_type,

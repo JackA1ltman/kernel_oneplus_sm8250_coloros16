@@ -436,6 +436,7 @@ wait:
 	if (cvp_comm_release_persist_buffers(inst))
 		dprintk(CVP_ERR,
 			"Failed to release persist buffers\n");
+
 #ifdef OPLUS_FEATURE_CAMERA_COMMON
 	msm_cvp_session_queue_stop(inst);
 #endif

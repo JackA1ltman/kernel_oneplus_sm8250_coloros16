@@ -40,7 +40,7 @@
 
 static struct device_attribute power_supply_attrs[];
 
-static const char * const power_supply_type_text[] = {
+static const char *const power_supply_type_text[] = {
 	"Unknown", "Battery", "UPS", "Mains", "USB",
 	"USB_DCP", "USB_CDP", "USB_ACA", "USB_C",
 	"USB_PD", "USB_PD_DRP", "BrickID",
@@ -566,6 +566,9 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(battery_type),
 	POWER_SUPPLY_ATTR(cycle_counts),
 	POWER_SUPPLY_ATTR(serial_number),
+#ifdef OPLUS_CUSTOM_OP_DEF
+	POWER_SUPPLY_ATTR(reset_rd),
+#endif /* OPLUS_CUSTOM_OP_DEF */
 #ifdef OPLUS_FEATURE_CHG_BASIC
 	POWER_SUPPLY_ATTR(parallel_current_now),
 	POWER_SUPPLY_ATTR(smb1355_test),
@@ -669,8 +672,12 @@ int power_supply_uevent(struct device *dev, struct kobj_uevent_env *env)
 		char *line;
 
 #ifdef OPLUS_FEATURE_CHG_BASIC
-		if (((psy->desc->properties[j] == POWER_SUPPLY_PROP_VOLTAGE_NOW) && (psy->desc->type == POWER_SUPPLY_TYPE_USB))
-			|| ((psy->desc->properties[j] == POWER_SUPPLY_PROP_CHARGE_NOW) && (psy->desc->type == POWER_SUPPLY_TYPE_BATTERY)))
+		if (((psy->desc->properties[j] ==
+		      POWER_SUPPLY_PROP_VOLTAGE_NOW) &&
+		     (psy->desc->type == POWER_SUPPLY_TYPE_USB)) ||
+		    ((psy->desc->properties[j] ==
+		      POWER_SUPPLY_PROP_CHARGE_NOW) &&
+		     (psy->desc->type == POWER_SUPPLY_TYPE_BATTERY)))
 			continue;
 #endif
 		attr = &power_supply_attrs[psy->desc->properties[j]];

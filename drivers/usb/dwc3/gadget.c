@@ -838,8 +838,8 @@ static void dwc3_remove_requests(struct dwc3 *dwc, struct dwc3_ep *dep)
 
 	dbg_log_string("START for %s(%d)", dep->name, dep->number);
 	ret = dwc3_stop_active_transfer(dwc, dep->number, true, false);
-    if(ret)
-    	return;
+	if (ret)
+		return;
 
 	if (dep->number == 0) {
 		unsigned int dir;
@@ -2281,6 +2281,7 @@ done:
 #ifdef OPLUS_FEATURE_CHG_BASIC
 #define DWC3_SOFT_RESET_TIMEOUT 10
 #endif
+
 static int dwc3_gadget_run_stop(struct dwc3 *dwc, int is_on, int suspend)
 {
 	u32			reg, reg1;
@@ -2340,7 +2341,9 @@ static int dwc3_gadget_run_stop(struct dwc3 *dwc, int is_on, int suspend)
 			diff = ktime_sub(ktime_get(), start);
 			/* poll for max. 10ms */
 			if (ktime_to_ms(diff) > DWC3_SOFT_RESET_TIMEOUT) {
-				printk_ratelimited(KERN_ERR"%s:core Reset Timed Out\n", __func__);
+				printk_ratelimited(KERN_ERR
+						   "%s:core Reset Timed Out\n",
+						   __func__);
 				break;
 			}
 			cpu_relax();
@@ -3519,12 +3522,12 @@ static void dwc3_reset_gadget(struct dwc3 *dwc)
 }
 
 int dwc3_stop_active_transfer(struct dwc3 *dwc, u32 epnum, bool force,
-	bool interrupt)
+			      bool interrupt)
 {
 	struct dwc3_ep *dep;
 	struct dwc3_gadget_ep_cmd_params params;
 	u32 cmd;
-	int ret=0;
+	int ret = 0;
 
 	dep = dwc->eps[epnum];
 

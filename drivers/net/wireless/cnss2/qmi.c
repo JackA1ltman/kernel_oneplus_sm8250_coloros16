@@ -6,8 +6,7 @@
 #include <linux/soc/qcom/qmi.h>
 
 #ifdef OPLUS_FEATURE_WIFI_BDF
-//
-//
+
 #include <soc/oplus/oplus_project.h>
 #include <linux/fs.h>
 #endif /* OPLUS_FEATURE_WIFI_BDF */
@@ -597,10 +596,10 @@ static int cnss_get_bdf_file_name(struct cnss_plat_data *plat_priv,
 #ifdef OPLUS_FEATURE_WIFI_BDF
 // check if read bdf is not complete through compare the size with odm/etc/wifi bdf file
 // return 0 if everything ok, otherwise return a non-zero value
-#define FILE_NAME_LENGTH                    128
-#define BDF_FILEPATH                         "/mnt/vendor/persist/"
-#define BDF_ODM_FILEPATH                         "/odm/etc/wifi/"
-#define BDF_VERSION_FILE                         "bin_version"
+#define FILE_NAME_LENGTH 128
+#define BDF_FILEPATH "/mnt/vendor/persist/"
+#define BDF_ODM_FILEPATH "/odm/etc/wifi/"
+#define BDF_VERSION_FILE "bin_version"
 
 /* string is in decimal */
 static bool get_integer_from_string(const u8 *str, int *pint)
@@ -641,22 +640,17 @@ static int read_file(char *file_name, u8 *file_buf)
 		return -ENOENT;
 	}
 
-#if 1
 	inode = filp->f_inode;
-#else
-	/* reserved for linux earlier verion */
-	inode = filp->f_dentry->d_inode;
-#endif
-
 	file_len = inode->i_size;
 
 	old_fs = get_fs();
 	set_fs(KERNEL_DS);
 	pos = 0;
-	ret = vfs_read(filp, file_buf, file_len , &pos);
+	ret = vfs_read(filp, file_buf, file_len, &pos);
 	if (ret < 0)
 		cnss_pr_err("read file fail");
-	cnss_pr_dbg("file len:%d read len:%d pos:%d", (u32)file_len, ret, (u32)pos);
+	cnss_pr_dbg("file len:%d read len:%d pos:%d", (u32)file_len, ret,
+		    (u32)pos);
 	filp_close(filp, NULL);
 	set_fs(old_fs);
 
@@ -676,7 +670,8 @@ int check_bdf_version(struct cnss_plat_data *plat_priv, char *file_name)
 
 	cnss_pr_dbg("start check with bdf version");
 
-	snprintf(file_path, FILE_NAME_LENGTH, "%s%s", BDF_ODM_FILEPATH, file_name);
+	snprintf(file_path, FILE_NAME_LENGTH, "%s%s", BDF_ODM_FILEPATH,
+		 file_name);
 	ret = read_file(file_path, fw_file_buf);
 	if (ret < 0) {
 		cnss_pr_err("Failed to load: %s\n", file_path);
@@ -687,7 +682,8 @@ int check_bdf_version(struct cnss_plat_data *plat_priv, char *file_name)
 		cnss_pr_dbg("read odm_verison %x\n", odm_verison);
 	}
 
-	ret = request_firmware_no_cache(&fw_entry, file_name, &plat_priv->plat_dev->dev);
+	ret = request_firmware_no_cache(&fw_entry, file_name,
+					&plat_priv->plat_dev->dev);
 	if (ret) {
 		cnss_pr_err("Failed to load: %s\n", file_name);
 		return ret;
@@ -698,22 +694,25 @@ int check_bdf_version(struct cnss_plat_data *plat_priv, char *file_name)
 		cnss_pr_dbg("read persist_version %x\n", persist_version);
 	}
 
-	if ((persist_version > 0) && (odm_verison > 0) && (persist_version >= odm_verison))
+	if ((persist_version > 0) && (odm_verison > 0) &&
+	    (persist_version >= odm_verison))
 		ret = 0;
 
-	cnss_pr_dbg("persist version: %x, odm verison: %x", persist_version, odm_verison);
+	cnss_pr_dbg("persist version: %x, odm verison: %x", persist_version,
+		    odm_verison);
 
 	return ret;
 }
 
-int check_bdf_size(unsigned int download_bdf_size, char* bdf_file_name) {
+int check_bdf_size(unsigned int download_bdf_size, char *bdf_file_name)
+{
 	char str[48];
-	struct kstat* stat = NULL;
+	struct kstat *stat = NULL;
 	int ret = 0;
 
 	snprintf(str, sizeof(str), "%s%s", BDF_ODM_FILEPATH, bdf_file_name);
 	cnss_pr_dbg("vendor file name: %s", str);
-	stat = (struct kstat*) kzalloc(sizeof(struct kstat), GFP_KERNEL);
+	stat = (struct kstat *)kzalloc(sizeof(struct kstat), GFP_KERNEL);
 	if (!stat)
 		return -ENOMEM;
 
@@ -726,7 +725,8 @@ int check_bdf_size(unsigned int download_bdf_size, char* bdf_file_name) {
 		goto out;
 	}
 
-	cnss_pr_dbg("dl size: %d, stat size: %d", download_bdf_size, stat->size);
+	cnss_pr_dbg("dl size: %d, stat size: %d", download_bdf_size,
+		    stat->size);
 	if (download_bdf_size < stat->size) {
 		ret = -1;
 	}
@@ -749,7 +749,7 @@ int cnss_wlfw_bdf_dnld_send_sync(struct cnss_plat_data *plat_priv,
 	unsigned int remaining;
 	int ret = 0;
 #ifdef OPLUS_FEATURE_WIFI_BDF
-//Modify for: multi projects using different bdf
+	//Modify for: multi projects using different bdf
 	int loading_bdf_retry_cnt = 5;
 #endif /* OPLUS_FEATURE_WIFI_BDF */
 
@@ -779,7 +779,8 @@ int cnss_wlfw_bdf_dnld_send_sync(struct cnss_plat_data *plat_priv,
 #ifdef OPLUS_FEATURE_WIFI_BDF
 //Modify for: multi projects using different bdf
 request_bdf:
-	ret = request_firmware_no_cache(&fw_entry, filename, &plat_priv->plat_dev->dev);
+	ret = request_firmware_no_cache(&fw_entry, filename,
+					&plat_priv->plat_dev->dev);
 #else /* OPLUS_FEATURE_WIFI_BDF */
 	ret = request_firmware(&fw_entry, filename, &plat_priv->plat_dev->dev);
 #endif /* OPLUS_FEATURE_WIFI_BDF */
@@ -804,12 +805,13 @@ bypass_bdf:
 	cnss_pr_dbg("Downloading BDF: %s, size: %u\n", filename, remaining);
 
 #ifdef OPLUS_FEATURE_WIFI_BDF
-//Modify for: multi projects using different bdf
-	if (strncmp(filename, "bdwlan", 6) == 0
-		&& check_bdf_version(plat_priv, BDF_VERSION_FILE)
-		&& check_bdf_size(remaining, filename) && loading_bdf_retry_cnt > 0) {
+	//Modify for: multi projects using different bdf
+	if (strncmp(filename, "bdwlan", 6) == 0 &&
+	    check_bdf_version(plat_priv, BDF_VERSION_FILE) &&
+	    check_bdf_size(remaining, filename) && loading_bdf_retry_cnt > 0) {
 		loading_bdf_retry_cnt -= 1;
-		cnss_pr_dbg("bdf size is too small, maybe bdf is under transfer, retry loading..");
+		cnss_pr_dbg(
+			"bdf size is too small, maybe bdf is under transfer, retry loading..");
 		// sleep 400 ms
 		msleep_interruptible(400);
 		goto request_bdf;

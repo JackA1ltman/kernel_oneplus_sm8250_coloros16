@@ -8978,9 +8978,11 @@ void hdd_wlan_exit(struct hdd_context *hdd_ctx)
 	hdd_wlan_stop_modules(hdd_ctx, false);
 
 	hdd_driver_memdump_deinit();
+
 	#ifdef OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST
-        hdd_driver_oplus_deinit();
-        #endif /*OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST*/
+	hdd_driver_oplus_deinit();
+	#endif /*OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST*/
+
 	qdf_nbuf_deinit_replenish_timer();
 
 	if (QDF_GLOBAL_MONITOR_MODE ==  hdd_get_conparam()) {
@@ -14329,9 +14331,11 @@ int hdd_wlan_startup(struct hdd_context *hdd_ctx)
 
 	osif_request_manager_init();
 	hdd_driver_memdump_init();
-        #ifdef OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST
-        hdd_driver_oplus_init();
-        #endif /*OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST*/
+
+	#ifdef OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST
+	hdd_driver_oplus_init();
+	#endif /*OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST*/
+
 	hdd_dp_trace_init(hdd_ctx->config);
 
 	errno = hdd_wlan_start_modules(hdd_ctx, false);
@@ -14398,8 +14402,8 @@ stop_modules:
 	hdd_wlan_stop_modules(hdd_ctx, false);
 
 memdump_deinit:
-        #ifdef OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST
-        hdd_driver_oplus_deinit();
+	#ifdef OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST
+	hdd_driver_oplus_deinit();
 	#endif /*OPLUS_FEATURE_WIFI_DUALSTA_AP_BLACKLIST*/
 	hdd_driver_memdump_deinit();
 	osif_request_manager_deinit();

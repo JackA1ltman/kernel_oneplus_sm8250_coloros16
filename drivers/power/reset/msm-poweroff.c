@@ -31,7 +31,6 @@
 #include <soc/oplus/system/oplus_project.h>
 #include <soc/oplus/system/qcom_minidump_enhance.h>
 #endif
-
 #ifdef CONFIG_OPLUS_FEATURE_MISC
 #include <soc/oplus/system/oplus_misc.h>
 #endif
@@ -198,22 +197,22 @@ void oplus_switch_fulldump(int on)
 	if (dload_mode_addr) {
 		__raw_writel(0xE47B337D, dload_mode_addr);
 		__raw_writel(0xCE14091A,
-			dload_mode_addr + sizeof(unsigned int));
+			     dload_mode_addr + sizeof(unsigned int));
 		mb();
 	}
-	if(on){
+	if (on) {
 		ret = scm_set_dload_mode(SCM_DLOAD_FULLDUMP, 0);
 		if (ret)
 			pr_err("Failed to set secure DLOAD mode: %d\n", ret);
 		dload_type = SCM_DLOAD_FULLDUMP;
-	}else{
+	} else {
 		ret = scm_set_dload_mode(SCM_DLOAD_MINIDUMP, 0);
 		if (ret)
 			pr_err("Failed to set secure DLOAD mode: %d\n", ret);
 		dload_type = SCM_DLOAD_MINIDUMP;
 	}
 
-	if(dload_type == SCM_DLOAD_MINIDUMP)
+	if (dload_type == SCM_DLOAD_MINIDUMP)
 		__raw_writel(EMMC_DLOAD_TYPE, dload_type_addr);
 	else
 		__raw_writel(0, dload_type_addr);

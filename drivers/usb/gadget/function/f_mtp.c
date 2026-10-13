@@ -1171,7 +1171,8 @@ static long mtp_send_receive_ioctl(struct file *fp, unsigned int code,
 	flush_workqueue(dev->wq);
 	fput(filp);
 #ifdef OPLUS_FEATURE_CHG_BASIC
-	atomic_notifier_call_chain(&mtp_rw_notifier, code | 0x8000, (void *)&mfr);
+	atomic_notifier_call_chain(&mtp_rw_notifier, code | 0x8000,
+				   (void *)&mfr);
 #endif
 
 	/* read the result */

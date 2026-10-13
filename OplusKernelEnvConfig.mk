@@ -209,6 +209,9 @@ ifeq ($(OPLUS_FEATURE_UFSPLUS),yes)
 export OPLUS_FEATURE_UFSPLUS=y
 endif
 
+# from lineage-24.0 (upstream oplus.config regeneration)
+export OPLUS_FEATURE_CAMERA_COMMON=yes
+
 ifeq ($(CONFIG_OPLUS_FEATURE_SAUPWK),yes)
 export CONFIG_OPLUS_FEATURE_SAUPWK=y
 endif

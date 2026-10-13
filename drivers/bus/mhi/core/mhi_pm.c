@@ -1065,7 +1065,7 @@ void mhi_control_error(struct mhi_controller *mhi_cntrl)
 		MHI_CNTRL_ERR("mhi:%s sfr: %s\n", mhi_cntrl->name,
 				sfr_info->buf_addr);
 #ifdef OPLUS_BUG_STABILITY
-		if(strstr(sfr_info->buf_addr, "remotefs_sahara.c")) {
+		if (strstr(sfr_info->buf_addr, "remotefs_sahara.c")) {
 			direct_panic = true;
 		}
 #endif

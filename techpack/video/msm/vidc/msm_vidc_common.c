@@ -2752,7 +2752,7 @@ exit:
 	put_inst(inst);
 }
 
-void handle_cmd_response(enum hal_command_response cmd, void *data)
+void handle_cmd_response(u32 cmd, void *data)
 {
 	switch (cmd) {
 	case HAL_SYS_INIT_DONE:
@@ -4762,10 +4762,12 @@ int msm_comm_qbuf(struct msm_vidc_inst *inst, struct msm_vidc_buffer *mbuf)
 	}
 	mbuf->flags |= MSM_VIDC_FLAG_QUEUED;
 	mutex_unlock(&inst->registeredbufs.lock);
+
 	do_bw_calc = mbuf->vvb.vb2_buf.type == INPUT_MPLANE;
 	rc = msm_comm_scale_clocks_and_bus(inst, do_bw_calc);
 	if (rc)
 		s_vpr_e(inst->sid, "%s: scale clock & bw failed\n", __func__);
+
 	mutex_lock(&inst->registeredbufs.lock);
 	print_vidc_buffer(VIDC_HIGH|VIDC_PERF, "qbuf", inst, mbuf);
 	ctrl = get_ctrl(inst, V4L2_CID_MPEG_VIDC_SUPERFRAME);
@@ -4778,6 +4780,7 @@ int msm_comm_qbuf(struct msm_vidc_inst *inst, struct msm_vidc_buffer *mbuf)
 	if (rc)
 		s_vpr_e(inst->sid, "%s: Failed qbuf to hfi: %d\n",
 			__func__, rc);
+	mutex_unlock(&inst->registeredbufs.lock);
 
 	mutex_unlock(&inst->registeredbufs.lock);
 	return rc;

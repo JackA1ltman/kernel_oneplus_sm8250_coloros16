@@ -164,6 +164,7 @@ static int _copy_sysprop_to_user(struct cvp_kmd_arg *kp,
 	return 0;
 
 }
+
 #ifndef OPLUS_FEATURE_CAMERA_COMMON
 static void _set_deprecate_bitmask(struct cvp_kmd_arg *kp,
 			struct msm_cvp_inst *inst)
@@ -196,6 +197,7 @@ static void _set_deprecate_bitmask(struct cvp_kmd_arg *kp,
 	}
 }
 #endif
+
 static void print_hfi_short(struct cvp_kmd_arg __user *up)
 {
 	struct cvp_kmd_hfi_packet *pkt;

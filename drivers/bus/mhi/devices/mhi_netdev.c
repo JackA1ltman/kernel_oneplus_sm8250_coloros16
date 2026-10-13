@@ -71,13 +71,13 @@
 		panic(msg); \
 } while (0)
 
-/* #ifdef OPLUS_BUG_STABILITY */
+#ifdef OPLUS_BUG_STABILITY
 /* xufeifei@Netowrk.DATA.DRIVER, double the bg pool for mhi to avoid mhi OOM */
-#define OPLUS_MSG_ERR(fmt, ...) do{ \
-    pr_err("[E][%s] " fmt, __func__, ##__VA_ARGS__); \
-}while (0)
-/* #endif OPLUS_BUG_STABILITY */
-
+#define OPLUS_MSG_ERR(fmt, ...)                                  \
+	do {                                                     \
+		pr_err("[E][%s] " fmt, __func__, ##__VA_ARGS__); \
+	} while (0)
+#endif /* OPLUS_BUG_STABILITY */
 
 struct mhi_net_chain {
 	struct sk_buff *head, *tail; /* chained skb */
@@ -295,9 +295,9 @@ static void mhi_netdev_queue(struct mhi_netdev *mhi_netdev,
 	struct list_head *pool = mhi_netdev->recycle_pool;
 	int nr_tre = mhi_get_no_free_descriptors(mhi_dev, DMA_FROM_DEVICE);
 	int i, ret;
-    /* #ifdef OPLUS_BUG_STABILITY*/
-	//const int  max_peek = 4;
-    /* #endif OPLUS_BUG_STABILITY*/
+#ifndef OPLUS_BUG_STABILITY
+	const int  max_peek = 4;
+#endif /* OPLUS_BUG_STABILITY */
 	MSG_VERB("Enter free_desc:%d\n", nr_tre);
 
 	if (!nr_tre)
@@ -308,9 +308,9 @@ static void mhi_netdev_queue(struct mhi_netdev *mhi_netdev,
 		/* peek for the next buffer, we going to peak several times,
 		 * and we going to give up if buffers are not yet free
 		 */
-        /* #ifdef OPLUS_BUG_STABILITY*/
-		//int peek = 0;
-        /* #endif OPLUS_BUG_STABILITY*/
+#ifndef OPLUS_BUG_STABILITY
+		int peek = 0;
+#endif /* OPLUS_BUG_STABILITY*/
 		netbuf = NULL;
 		list_for_each_entry(mhi_buf, pool, node) {
 			/* page == 1 idle, buffer is free to reclaim */
@@ -318,10 +318,11 @@ static void mhi_netdev_queue(struct mhi_netdev *mhi_netdev,
 				netbuf = (struct mhi_netbuf *)mhi_buf;
 				break;
 			}
-			/* #ifdef OPLUS_BUG_STABILITY*/
-			//if (peek++ >= max_peek)
-			//	break;
-			/* #endif OPLUS_BUG_STABILITY*/
+
+#ifndef OPLUS_BUG_STABILITY
+			if (peek++ >= max_peek)
+				break;
+#endif /* OPLUS_BUG_STABILITY */
 		}
 
 		/* could not find a free buffer */
@@ -350,17 +351,17 @@ static void mhi_netdev_queue(struct mhi_netdev *mhi_netdev,
 
 	/* recycling did not work, buffers are still busy use bg pool */
 	if (i < nr_tre) {
-		MSG_ERR("recycle pool not enough, nr_tre is %d, i is %d ", nr_tre, i);
+		MSG_ERR("recycle pool not enough, nr_tre is %d, i is %d ",
+			nr_tre, i);
 		i += mhi_netdev_queue_bg_pool(mhi_netdev, mhi_dev, nr_tre - i);
-    }
-
+	}
 
 	/* recyling did not work, buffers are still busy allocate temp pkts */
 	if (i < nr_tre) {
-		MSG_ERR("recycle pool and bg pool not enough, nr_tre is %d, i is %d ", nr_tre, i);
+		MSG_ERR("recycle pool and bg pool not enough, nr_tre is %d, i is %d ",
+			nr_tre, i);
 		mhi_netdev_tmp_alloc(mhi_netdev, mhi_dev, nr_tre - i);
-    }
-
+	}
 }
 
 /* allocating pool of memory */
@@ -561,18 +562,19 @@ static int mhi_netdev_change_mtu(struct net_device *dev, int new_mtu)
 	return 0;
 }
 
-static int mhi_netdev_xmit(struct sk_buff *skb, struct net_device *dev)
+static netdev_tx_t mhi_netdev_xmit(struct sk_buff *skb, struct net_device *dev)
 {
 	struct mhi_netdev_priv *mhi_netdev_priv = netdev_priv(dev);
 	struct mhi_netdev *mhi_netdev = mhi_netdev_priv->mhi_netdev;
 	struct mhi_device *mhi_dev = mhi_netdev->mhi_dev;
-	int res = 0;
+	netdev_tx_t res = NETDEV_TX_OK;
+	int ret;
 
 	MSG_VERB("Entered\n");
 
-	res = mhi_queue_transfer(mhi_dev, DMA_TO_DEVICE, skb, skb->len,
+	ret = mhi_queue_transfer(mhi_dev, DMA_TO_DEVICE, skb, skb->len,
 				 MHI_EOT);
-	if (res) {
+	if (ret) {
 		MSG_VERB("Failed to queue with reason:%d\n", res);
 		netif_stop_queue(dev);
 		res = NETDEV_TX_BUSY;
@@ -1077,12 +1079,12 @@ static int mhi_netdev_probe(struct mhi_device *mhi_dev,
 			mhi_netdev->pool_size <<= 1;
 		mhi_netdev->pool_size <<= 1;
 
-		/* #ifdef OPLUS_BUG_STABILITY */
+#ifdef OPLUS_BUG_STABILITY
 		/* xufeifei@Netowrk.DATA.DRIVER, double the bg pool for mhi to avoid mhi OOM */
 		mhi_netdev->pool_size <<= 1;
-		OPLUS_MSG_ERR("mhi bg pool size is: %d \n", mhi_netdev->pool_size);
-		/* #endif OPLUS_BUG_STABILITY*/
-
+		OPLUS_MSG_ERR("mhi bg pool size is: %d \n",
+			      mhi_netdev->pool_size);
+#endif /* OPLUS_BUG_STABILITY */
 
 		/* if we expect child device to share then double the pool */
 		if (of_parse_phandle(of_node, "mhi,rsc-child", 0))
@@ -1102,14 +1104,13 @@ static int mhi_netdev_probe(struct mhi_device *mhi_dev,
 		init_waitqueue_head(&mhi_netdev->alloc_event);
 		INIT_LIST_HEAD(mhi_netdev->bg_pool);
 		spin_lock_init(&mhi_netdev->bg_lock);
-
-        /* #ifdef OPLUS_BUG_STABILITY */
-        /* xufeifei@Netowrk.DATA.DRIVER, double the bg pool for mhi to avoid mhi OOM , 
-        for bg pool has double, bg pool limit should division 8*/
-        // mhi_netdev->bg_pool_limit = mhi_netdev->pool_size / 4;
-        mhi_netdev->bg_pool_limit = mhi_netdev->pool_size / 8;
-        /* #endif OPLUS_BUG_STABILITY*/
-
+#ifdef OPLUS_BUG_STABILITY
+		/* xufeifei@Netowrk.DATA.DRIVER, double the bg pool for mhi to avoid mhi OOM,
+		   for bg pool has double, bg pool limit should division 8 */
+		mhi_netdev->bg_pool_limit = mhi_netdev->pool_size / 8;
+#else
+		mhi_netdev->bg_pool_limit = mhi_netdev->pool_size / 4;
+#endif /* OPLUS_BUG_STABILITY */
 		mhi_netdev->alloc_task = kthread_run(mhi_netdev_alloc_thread,
 						     mhi_netdev,
 						     mhi_netdev->ndev->name);

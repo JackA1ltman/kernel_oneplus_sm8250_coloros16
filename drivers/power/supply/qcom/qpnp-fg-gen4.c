@@ -1616,8 +1616,14 @@ static int fg_gen4_adjust_ki_coeff_full_soc(struct fg_gen4_chip *chip,
 	int rc, ki_coeff_full_soc_norm, ki_coeff_full_soc_low;
 	u8 val;
 
+#ifndef OPLUS_FEATURE_CHG_BASIC
 	if ((batt_temp < 0) ||
-		(fg->charge_status == POWER_SUPPLY_STATUS_DISCHARGING) || (fg->charge_status == POWER_SUPPLY_STATUS_NOT_CHARGING)) {
+		(fg->charge_status == POWER_SUPPLY_STATUS_DISCHARGING)) {
+#else
+	if ((batt_temp < 0) ||
+		(fg->charge_status == POWER_SUPPLY_STATUS_DISCHARGING) ||
+		(fg->charge_status == POWER_SUPPLY_STATUS_NOT_CHARGING)) {
+#endif
 		ki_coeff_full_soc_norm = 0;
 		ki_coeff_full_soc_low = 0;
 	} else if (fg->charge_status == POWER_SUPPLY_STATUS_CHARGING) {
@@ -3452,9 +3458,16 @@ static int fg_gen4_validate_soc_scale_mode(struct fg_gen4_chip *chip)
 		goto fail_soc_scale;
 	}
 
-	if (!chip->soc_scale_mode && (fg->charge_status ==
-		POWER_SUPPLY_STATUS_DISCHARGING || fg->charge_status == POWER_SUPPLY_STATUS_NOT_CHARGING )&&
+#ifndef OPLUS_FEATURE_CHG_BASIC
+	if (!chip->soc_scale_mode && fg->charge_status ==
+		POWER_SUPPLY_STATUS_DISCHARGING &&
 		chip->vbatt_avg < chip->dt.vbatt_scale_thr_mv) {
+#else
+	if (!chip->soc_scale_mode &&
+	    (fg->charge_status == POWER_SUPPLY_STATUS_DISCHARGING ||
+	     fg->charge_status == POWER_SUPPLY_STATUS_NOT_CHARGING) &&
+	    chip->vbatt_avg < chip->dt.vbatt_scale_thr_mv) {
+#endif
 		rc = fg_gen4_enter_soc_scale(chip);
 		if (rc < 0) {
 			pr_err("Failed to enter SOC scale mode\n");
@@ -6087,6 +6100,7 @@ static int fg_gen4_parse_dt(struct fg_gen4_chip *chip)
 		}
 	}
 
+
 	rc = fg_gen4_parse_child_nodes_dt(chip);
 	if (rc < 0)
 		return rc;
@@ -6501,7 +6515,6 @@ static const struct vadc_map_pt adcmap_100k_vref[] = {
   {135,  940},
   {128,  960},
   {121,  980}
-
 };
 
 static int qcom_vadc_map_voltage_temp(const struct vadc_map_pt *pts,

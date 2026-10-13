@@ -1753,7 +1753,6 @@ static int ufshcd_clock_scaling_prepare(struct ufs_hba *hba)
 #else
 	#define DOORBELL_CLR_TOUT_US		(1000 * 1000) /* 1 sec */
 #endif
-
 	int ret = 0;
 	/*
 	 * make sure that there are no outstanding requests when
@@ -7762,7 +7761,7 @@ static void ufshcd_rls_handler(struct work_struct *work)
 
 	pm_runtime_get_sync(hba->dev);
 #ifndef OPLUS_BUG_STABILITY
-/* add for fix dead lock between ufshcd_rls_handler/ufshcd_link_recovery */
+	/* add for fix dead lock between ufshcd_rls_handler/ufshcd_link_recovery */
 	down_write(&hba->lock);
 #else
 	ret = down_write_trylock(&hba->lock);
@@ -8490,6 +8489,7 @@ cleanup:
 
 out:
 	if (!err) {
+		lrbp->cmd = NULL;
 		err = SUCCESS;
 	} else {
 		dev_err(hba->dev, "%s: failed with err %d\n", __func__, err);
@@ -8876,9 +8876,9 @@ static int ufshcd_scsi_add_wlus(struct ufs_hba *hba)
 	struct scsi_device *sdev_boot = NULL;
 #ifdef OPLUS_FEATURE_UFS_DRIVER
 	/* add for ufs device in /proc/devinfo */
-		static char temp_version[5] = {0};
-		static char vendor[9] = {0};
-		static char model[17] = {0};
+	static char temp_version[5] = { 0 };
+	static char vendor[9] = { 0 };
+	static char model[17] = { 0 };
 #endif
 
 	hba->sdev_ufs_device = __scsi_add_device(hba->host, 0, 0,
@@ -8910,7 +8910,7 @@ remove_sdev_ufs_device:
 	scsi_remove_device(hba->sdev_ufs_device);
 out:
 #ifdef OPLUS_FEATURE_UFS_DRIVER
-/* add for ufs device in /proc/devinfo */
+	/* add for ufs device in /proc/devinfo */
 	strncpy(temp_version, hba->sdev_ufs_device->rev, 4);
 	strncpy(vendor, hba->sdev_ufs_device->vendor, 8);
 	strncpy(model, hba->sdev_ufs_device->model, 16);
@@ -9853,10 +9853,9 @@ static int ufshcd_query_ioctl(struct ufs_hba *hba, u8 lun, void __user *buffer)
 		case QUERY_ATTR_IDN_EE_STATUS:
 		case QUERY_ATTR_IDN_SECONDS_PASSED:
 #ifdef OPLUS_FEATURE_STORAGE_TOOL
-	/*  add for read ffu status attribute by ioctl */
+		/* add for read ffu status attribute by ioctl */
 		case QUERY_ATTR_IDN_FFU_STATUS:
 #endif
-
 			index = 0;
 			break;
 		case QUERY_ATTR_IDN_DYN_CAP_NEEDED:

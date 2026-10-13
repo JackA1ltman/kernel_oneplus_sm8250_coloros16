@@ -2788,8 +2788,8 @@ static int cnss_probe(struct platform_device *plat_dev)
 #ifdef OPLUS_BUG_STABILITY
 	//Add for: disable wifi while power off charging because modem img will not mount
 	if (qpnp_is_power_off_charging() &&
-		(get_boot_mode() != MSM_BOOT_MODE__WLAN) &&
-		(get_boot_mode() != MSM_BOOT_MODE__RF)) {
+	    (get_boot_mode() != MSM_BOOT_MODE__WLAN) &&
+	    (get_boot_mode() != MSM_BOOT_MODE__RF)) {
 		cnss_pr_err("charge mode do not load wifi!\n");
 		goto out;
 	}

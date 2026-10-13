@@ -383,7 +383,7 @@ struct msm_cvp_fence_thread_data {
 
 extern struct msm_cvp_drv *cvp_driver;
 
-void cvp_handle_cmd_response(enum hal_command_response cmd, void *data);
+void cvp_handle_cmd_response(u32 cmd, void *data);
 int msm_cvp_trigger_ssr(struct msm_cvp_core *core,
 	enum hal_ssr_trigger_type type);
 int msm_cvp_noc_error_info(struct msm_cvp_core *core);
@@ -396,6 +396,7 @@ enum msm_cvp_flags {
 	MSM_CVP_FLAG_QUEUED              = BIT(2),
 };
 #endif
+
 struct msm_cvp_internal_buffer {
 	struct list_head list;
 	struct msm_cvp_smem smem;

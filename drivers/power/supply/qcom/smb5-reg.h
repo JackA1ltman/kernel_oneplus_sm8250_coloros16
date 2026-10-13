@@ -287,11 +287,13 @@ enum {
 #define USBIN_ADAPTER_FORCE_9V_BIT			         BIT(1)
 #define USBIN_ADAPTER_FORCE_5V_BIT			         BIT(0)
 
-
 #define USB_CMD_PULLDOWN_REG			(USBIN_BASE + 0x45)
 #define EN_PULLDOWN_USB_IN_BIT			BIT(0)
 
 #define TYPE_C_CFG_REG				(USBIN_BASE + 0x58)
+#ifdef OPLUS_FEATURE_CHG_BASIC
+#define APSD_START_ON_CC_BIT			BIT(7)
+#endif
 #define BC1P2_START_ON_CC_BIT			BIT(7)
 
 #define HVDCP_PULSE_COUNT_MAX_REG              (USBIN_BASE + 0x5B)
