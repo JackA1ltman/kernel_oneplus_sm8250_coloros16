@@ -158,7 +158,7 @@ static bool timeline_fence_signaled(struct dma_fence *fence)
 {
 	struct sync_timeline *parent = dma_fence_parent(fence);
 
-	return !__dma_fence_is_later(fence->seqno, parent->value, fence->ops);
+	return !__dma_fence_is_later(fence->seqno, parent->value);
 }
 
 static bool timeline_fence_enable_signaling(struct dma_fence *fence)
@@ -169,7 +169,7 @@ static bool timeline_fence_enable_signaling(struct dma_fence *fence)
 static void timeline_fence_value_str(struct dma_fence *fence,
 				    char *str, int size)
 {
-	snprintf(str, size, "%lld", fence->seqno);
+	snprintf(str, size, "%d", fence->seqno);
 }
 
 static void timeline_fence_timeline_value_str(struct dma_fence *fence,
