@@ -54,9 +54,9 @@ void clear_page_memcg(struct cgroup_cache_page *cache)
 
 	list_for_each(pos, &cache->head) {
 		page = list_entry(pos, struct page, lru);
-		if (!page->mem_cgroup)
+		if (!page_memcg(page))
 			BUG();
-		page->mem_cgroup = NULL;
+		page->memcg_data = 0;
 	}
 
 out:
@@ -147,7 +147,7 @@ void del_page_from_cache_with_cache(struct page *page,
 
 void put_anon_pages(struct page *page)
 {
-	memcg_hybs_t *hybs = MEMCGRP_ITEM_DATA(page->mem_cgroup);
+	memcg_hybs_t *hybs = MEMCGRP_ITEM_DATA(page_memcg(page));
 
 	spin_lock(&hybs->cache.lock);
 	list_add(&page->lru, &hybs->cache.head);
@@ -262,7 +262,7 @@ int add_anon_page2cache(struct zram * zram, u32 index, struct page *page)
 	if (akcompressd_threads == 0)
 		return 0;
 
-	memcg = page->mem_cgroup;
+	memcg = page_memcg(page);
 	if (!memcg || !MEMCGRP_ITEM_DATA(memcg))
 		return 0;
 
@@ -288,7 +288,7 @@ int add_anon_page2cache(struct zram * zram, u32 index, struct page *page)
 	kunmap_atomic(src);
 	kunmap_atomic(dst);
 
-	dst_page->mem_cgroup = memcg;
+	dst_page->memcg_data = (unsigned long)memcg;
 	set_page_private(dst_page, mk_page_val(cache->id, index));
 	update_zram_index(zram, index, (unsigned long)dst_page);
 	atomic64_inc(&cached_cnt);
@@ -340,7 +340,7 @@ finish_last_jobs:
 				list_add(&page->lru, &compress_fail_list);
 			else {
 				atomic64_inc(&akc_cnt[thread_idx]);
-				page->mem_cgroup = NULL;
+				page->memcg_data = 0;
 				put_free_page(page);
 			}
 			page = get_anon_page(zram_info, cache);

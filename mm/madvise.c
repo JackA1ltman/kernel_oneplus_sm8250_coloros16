@@ -212,7 +212,7 @@ static int swapin_walk_pmd_entry(pmd_t *pmd, unsigned long start,
 		spinlock_t *ptl;
 
 #if defined(CONFIG_NANDSWAP) || defined(CONFIG_PROCESS_RECLAIM_ENHANCE)
-		if (!list_empty(&vma->vm_mm->mmap_sem.wait_list))
+		if (!list_empty(&vma->vm_mm->mmap_lock.wait_list))
 			return -1;
 #endif
 		orig_pte = pte_offset_map_lock(vma->vm_mm, pmd, start, &ptl);

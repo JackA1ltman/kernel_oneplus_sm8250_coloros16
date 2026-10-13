@@ -169,10 +169,10 @@ void trigger_svm_oom_event(struct mm_struct *mm, bool brk_risk, bool is_locked)
 		if (mm->va_feature & RESERVE_AREA)
 			res = 1;
 	} else {
-		down_read(&mm->mmap_sem);
+		mmap_read_lock(mm);
 		if (mm->va_feature & RESERVE_AREA)
 			res = 1;
-		up_read(&mm->mmap_sem);
+		mmap_read_unlock(mm);
 	}
 
 	if ((svm_oom_pid == current->pid) &&

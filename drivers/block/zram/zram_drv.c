@@ -24,6 +24,7 @@
 #include <linux/device.h>
 #include <linux/genhd.h>
 #include <linux/highmem.h>
+#include <linux/memcontrol.h>
 #include <linux/slab.h>
 #include <linux/backing-dev.h>
 #include <linux/string.h>
@@ -1263,7 +1264,7 @@ static void zram_free_page(struct zram *zram, size_t index)
 		struct page *page = (struct page *)zram_get_page(zram, index);
 
 		del_page_from_cache(page);
-		page->mem_cgroup = NULL;
+		page->memcg_data = 0;
 		put_free_page(page);
 		zram_clear_flag(zram, index, ZRAM_CACHED);
 		goto out;
@@ -1422,7 +1423,7 @@ compress_again:
 	zram_set_handle(zram, index, handle);
 	zram_set_obj_size(zram, index, comp_len);
 #ifdef CONFIG_HYBRIDSWAP_CORE
-	hybridswap_track(zram, index, page->mem_cgroup);
+	hybridswap_track(zram, index, page_memcg(page));
 #endif
 	zram_slot_unlock(zram, index);
 
@@ -1681,7 +1682,7 @@ out:
 	}
 
 #ifdef CONFIG_HYBRIDSWAP_CORE
-	hybridswap_track(zram, index, page->mem_cgroup);
+	hybridswap_track(zram, index, page_memcg(page));
 #endif
 	zram_slot_unlock(zram, index);
 
