@@ -2895,6 +2895,14 @@ static int bq27541_get_battery_soh(void) /*  sjc20150105  */
 				dev_err(gauge_ic->dev, "error reading soh.\n");
 				return 0;
 			}
+			/*
+			 * Some gauge firmwares (e.g. OP8 bq27411) report SOH in 0.1% units:
+			 * raw 857 means 85.7%. Normalize to 1% before the range check,
+			 * otherwise the value is rejected here (and clamped to 100 at the
+			 * end of this function), so health always shows 100%.
+			 */
+			if (soh > 100 && soh <= 1000)
+				soh = (soh + 5) / 10;
 			if (normal_range_judge(SOH_MAX, SOH_MIN, soh))
 				break;
 			else
@@ -2942,6 +2950,14 @@ static int bq27541_get_sub_battery_soh(void)
 				return 0;
 			}
 
+			/*
+			 * Some gauge firmwares (e.g. OP8 bq27411) report SOH in 0.1% units:
+			 * raw 857 means 85.7%. Normalize to 1% before the range check,
+			 * otherwise the value is rejected here (and clamped to 100 at the
+			 * end of this function), so health always shows 100%.
+			 */
+			if (soh > 100 && soh <= 1000)
+				soh = (soh + 5) / 10;
 			if (normal_range_judge(SOH_MAX, SOH_MIN, soh))
 				break;
 			else

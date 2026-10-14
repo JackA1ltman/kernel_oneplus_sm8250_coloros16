@@ -1798,6 +1798,15 @@ static int bq27541_get_battery_soh(struct chip_bq27541 *chip) /*  sjc20150105  *
 			dev_err(chip->dev, "error reading fcc.\n");
 			return 0;
 		}
+		/*
+		 * Some gauge firmwares (e.g. OP8 bq27411) report SOH in 0.1% units:
+		 * raw 857 means 85.7%. Normalize to 1% before clamping, otherwise
+		 * the raw value is reported as-is and health never matches reality.
+		 */
+		if (soh > 100 && soh <= 1000)
+			soh = (soh + 5) / 10;
+		if (soh > 100)
+			soh = 100;
 	} else {
 		if (chip->soh_pre) {
 			return chip->soh_pre;
