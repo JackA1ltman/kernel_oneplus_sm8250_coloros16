@@ -1106,3 +1106,6 @@ CONFIG_DMABUF_HEAPS_SYSTEM=y
 CONFIG_DMABUF_HEAPS_CMA=y
 CONFIG_UDMABUF=y
 CONFIG_MEMFD_CREATE=y
+# [DT2W debug] keep enough kernel log to see what happened during a long
+# screen off (default is 17 = 128K, which wraps in minutes here).
+CONFIG_LOG_BUF_SHIFT=21
