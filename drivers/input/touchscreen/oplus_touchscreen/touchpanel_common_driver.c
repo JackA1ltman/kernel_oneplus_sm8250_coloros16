@@ -7908,6 +7908,16 @@ power_control_failed:
  * suspend function bind to LCD on/off status
  * Returning zero(sucess) or negative errno(failed)
  */
+/*
+ * [DT2W] The touch IRQ is the only thing that can pull the AP out of deep
+ * suspend for a gesture.  tp_i2c_suspend()/tp_i2c_resume() would do that via
+ * enable_irq_wake(), but they are never called on this platform, so a double
+ * tap could not wake a system that had actually suspended (screen stays dark
+ * and adb is unresponsive too - the AP never woke up).  Arm/disarm it in the
+ * display notifier path that is really used instead.
+ */
+static bool tp_irq_wake_armed;
+
 static int tp_suspend(struct device *dev)
 {
     u64 start_time = 0;
@@ -8036,6 +8046,15 @@ EXIT:
     if (ts->health_monitor_v2_support) {
         tp_healthinfo_report(&ts->monitor_data_v2, HEALTH_SUSPEND, &start_time);
     }
+    /*
+     * Make the touch IRQ a wakeup source, otherwise a gesture cannot wake the
+     * AP out of deep suspend (the IC reports, the CPU just never comes up).
+     */
+    if (!tp_irq_wake_armed && ((ts->gesture_enable & 0x01) == 1 || ts->fp_enable)) {
+        tp_irq_wake_armed = true;
+        enable_irq_wake(ts->irq);
+        TPD_INFO("[DT2W] irq_wake armed (gesture can now wake the AP)\n");
+    }
     TPD_INFO("%s: end.\n", __func__);
 
 	if ((ts->iovcc_shutdown_support)&& (!ts->gesture_enable)) {
@@ -8069,6 +8088,12 @@ static void tp_resume(struct device *dev)
     struct touchpanel_data *ts = dev_get_drvdata(dev);
 
     TPD_INFO("%s start.\n", __func__);
+
+    if (tp_irq_wake_armed) {
+        tp_irq_wake_armed = false;
+        disable_irq_wake(ts->irq);
+        TPD_INFO("[DT2W] irq_wake disarmed on resume\n");
+    }
 
     if (!ts->is_suspended) {
         TPD_INFO("%s: do not resume twice.\n", __func__);
@@ -8170,6 +8195,23 @@ static void lcd_trigger_load_tp_fw(struct work_struct *work)
 			}
             mutex_unlock(&ts->mutex);
             is_running = false;
+
+            /*
+             * reset() (above) wipes the IC's gesture mode.  When the panel
+             * re-initialises while the touch driver is still suspended - which
+             * is what happens on panel low power/AOD excursions during a long
+             * screen off - nothing else re-arms gesture mode, so double tap to
+             * wake stays dead until the next screen on/off cycle.  Re-apply the
+             * intended state here and unblock the userspace re-arm path.
+             */
+            mutex_lock(&ts->mutex);
+            ts->disable_gesture_ctrl = false;
+            if (ts->is_suspended) {
+                operate_mode_switch(ts);
+                TPD_INFO("[DT2W] re-armed after IC reset: gesture_enable=%d hall=%d fp_enable=%d\n",
+                         ts->gesture_enable, ts->hall_status, ts->fp_enable);
+            }
+            mutex_unlock(&ts->mutex);
 
             if (ts->health_monitor_v2_support) {
                 tp_healthinfo_report(&ts->monitor_data_v2, HEALTH_FW_UPDATE_COST, &start_time);
