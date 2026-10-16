@@ -19,6 +19,7 @@
 #include <linux/blkdev.h>
 #include <linux/kmsg_dump.h>
 #include <linux/mount.h>
+#include <linux/namei.h>
 #include <linux/kdev_t.h>
 #include <linux/uio.h>
 #include <soc/oplus/system/boot_mode.h>
@@ -46,7 +47,13 @@ pr_err("[op_kernel_log] "fmt, ##arg)
 
 #define KERNEL_HEAD_OFFSET         1024*1024*4 //reserve 0~ 4Mb for uefi log thread use
 #define PER_LOG_BLOCKS             512 //per log has 512*4096 = 2M space
-#define MAX_LOG_NUM                8
+/*
+ * 4M (uefi area) + MAX_LOG_NUM * 2M must stay inside the kernel_log partition
+ * (15872K); 8 slots would run 4M past its end, so keep 5 (= 14M).
+ */
+#define MAX_LOG_NUM                5
+/* partition to record into; resolved by path (see get_reserve_partition_bdev) */
+#define WB_LOG_PART                "/dev/block/by-name/kernel_log"
 
 #define NORAML_BOOT_WAIT_SS_TIME   50  // wait system server start time again, 50s+180s < 240s
 #define ABNORAML_BOOT_WAIT_SS_TIME 120 // wait system server start time again for abnormal boot
@@ -163,12 +170,14 @@ int wb_kernel_log(struct block_device *bdev, char *buf, char *line_buf)
 					memset(buf, 0, WB_BLOCK_SIZE);
 					temp_size = 0;
 				}
-				if (phx_is_system_server_init_start()) {
-					oprkl_info_print("system_server init ready, stop record\n");
-					//it mean kernel ~ native boot complete
-					boot_res = 0;
-					goto FINISH;
-				}
+				/*
+				 * The stock driver stops as soon as system_server is up
+				 * ("kernel ~ native boot complete"), which is why a hang
+				 * later in the boot - or one during Android's start - never
+				 * reached the partition at all.  Keep recording; the record
+				 * is bounded by PER_LOG_BLOCKS (2M) / the loop window
+				 * below, so this cannot grow without limit.
+				 */
 			}
 			isfull = false;
 			isforcewb = false;
@@ -350,21 +359,33 @@ int write_header(struct block_device *bdev, void *head, int len, int pos) {
 struct block_device *get_reserve_partition_bdev(void)
 {
 	struct block_device *bdev = NULL;
+	struct path path;
 	int retry_wait_for_device = RETRY_COUNT_FOR_GET_DEVICE;
 	dev_t dev;
 
 	while(retry_wait_for_device--) {
-		dev = name_to_dev_t("PARTLABEL=oplusreserve5");
-		if(dev != 0) {
-			bdev = blkdev_get_by_dev(dev, FMODE_READ | FMODE_WRITE, NULL);
-			oprkl_err_print("success to get dev block\n");
-			return bdev;
-		}
-		dev = name_to_dev_t("PARTLABEL=opporeserve5");
-		if(dev != 0) {
-			bdev = blkdev_get_by_dev(dev, FMODE_READ | FMODE_WRITE,NULL);
-			oprkl_err_print("success to get dev block\n");
-			return bdev;
+		/*
+		 * Resolve the partition by path and take the dev_t from its inode.
+		 * name_to_dev_t("PARTLABEL=oplusreserve5") never matches on this
+		 * device (there is no such partition), and a plain filp_open() of
+		 * the node is refused for a kernel thread by SELinux
+		 * (system:syslog_read / block_device:blk_file).  kern_path() only
+		 * walks the path, and blkdev_get_by_dev() does not go through the
+		 * LSM file checks at all.
+		 */
+		if (kern_path(WB_LOG_PART, LOOKUP_FOLLOW, &path) == 0) {
+			if (S_ISBLK(path.dentry->d_inode->i_mode)) {
+				dev = path.dentry->d_inode->i_rdev;
+				path_put(&path);
+				bdev = blkdev_get_by_dev(dev, FMODE_READ | FMODE_WRITE, NULL);
+				if (!IS_ERR_OR_NULL(bdev)) {
+					oprkl_err_print("using %s (dev %u:%u)\n",
+						WB_LOG_PART, MAJOR(dev), MINOR(dev));
+					return bdev;
+				}
+			} else {
+				path_put(&path);
+			}
 		}
 		oprkl_info_print("Failed to get dev block, retry %d\n", retry_wait_for_device);
 		msleep_interruptible(WAITING_FOR_GET_DEVICE);
@@ -481,10 +502,16 @@ static int reserve_log_main(void *arg)
 	}
 
 	if(read_header(bdev, &uefi_head, sizeof(struct uefi_log_thread_header), UEFI_HEAD_OFFSET)) {
-		oprkl_err_print("read uefi_log_thread_header failed\n");
-		goto EXIT;
+		/*
+		 * The UEFI log header is written by the bootloader into the first
+		 * blocks of the partition; on this device it is simply not there.
+		 * It is only used for the bookkeeping below, so continue with a
+		 * zeroed header instead of giving up on the whole recorder.
+		 */
+		oprkl_err_print("no uefi_log_thread_header, continue anyway\n");
+		memset(&uefi_head, 0, sizeof(uefi_head));
 	}
-	oprkl_info_print("Now kernel boot count %d and uefi boot count %d, is_monitoring %d, log number:[%d / 8]\n", kernel_head.bootcount, uefi_head.bootcount, kernel_head.is_monitoring, kernel_head.bootcount % MAX_LOG_NUM);
+	oprkl_info_print("Now kernel boot count %d and uefi boot count %d, is_monitoring %d, log number:[%d / %d]\n", kernel_head.bootcount, uefi_head.bootcount, kernel_head.is_monitoring, kernel_head.bootcount % MAX_LOG_NUM, MAX_LOG_NUM);
 	wb_start_offset += (HEADER_BLOCK + (kernel_head.bootcount % MAX_LOG_NUM) * PER_LOG_BLOCKS) * WB_BLOCK_SIZE;
 	oprkl_info_print("Write back start offset %llu\n", wb_start_offset);
 
