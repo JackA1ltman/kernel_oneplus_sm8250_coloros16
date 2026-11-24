@@ -45,6 +45,8 @@
 #define BINDER_STATS_CTL_CFG_SVR_FILTER_PROC_COMM 113
 #define BINDER_STATS_CTL_CFG_SVR_FILTER_UID 114
 #define BINDER_STATS_CTL_CFG_ENABLE_BINDER_COMM 115
+#define BINDER_STATS_CTL_SRVMGR_INT 120
+#define BINDER_STATS_CTL_SRVMGR_SET_HANDLE_NAME 121
 #define BINDER_STATS_CTL_RET_SUCC 0
 #define BINDER_STATS_CTL_RET_INVALID -1
 
@@ -112,6 +114,7 @@ struct binder_stats_driver {
 	struct list_head user_list_head;
 	bool regist_binder_stats_flag;
 	spinlock_t user_list_lock;
+	int srvmgr_tgid;
 };
 
 struct binder_stats_filter_srv_name {
@@ -127,6 +130,11 @@ struct binder_stats_filter_proc_comm {
 struct binder_stats_filter_uid {
 	int uid;
 	bool intreresting;
+};
+
+struct binder_stats_handle_name {
+	int handle;
+	char service_name[OPLUS_MAX_SERVICE_NAME_LEN];
 };
 
 struct binder_stats_filter_srv_name_node {
@@ -929,6 +937,7 @@ static long binder_stats_driver_ioctl(struct file *filp, unsigned int cmd, unsig
 	struct binder_stats_filter_srv_name filter_srv_name;
 	struct binder_stats_filter_proc_comm filter_proc_comm;
 	struct binder_stats_filter_uid filter_uid;
+	struct binder_stats_handle_name handle_name;
 	struct binder_stats_user_context *context_ptr = filp->private_data;
 
 	BINDER_STATS_LOGI("start cmd:%d arg:%lu\n", cmd, arg);
@@ -1059,6 +1068,28 @@ static long binder_stats_driver_ioctl(struct file *filp, unsigned int cmd, unsig
 			}
 		}
 		break;
+	case BINDER_STATS_CTL_SRVMGR_INT: {
+			g_binder_stats_driver.srvmgr_tgid = task_tgid_nr(current);
+			BINDER_STATS_LOGI("BINDER_STATS_CTL_SRVMGR_INT tgid:%d\n",
+					  g_binder_stats_driver.srvmgr_tgid);
+			ret = BINDER_STATS_CTL_RET_SUCC;
+		}
+		break;
+	case BINDER_STATS_CTL_SRVMGR_SET_HANDLE_NAME: {
+			if (0 != copy_from_user(&handle_name, (void __user *)arg,
+						sizeof(struct binder_stats_handle_name))) {
+				BINDER_STATS_LOGE("BINDER_STATS_CTL_SRVMGR_SET_HANDLE_NAME failed. copy_from_user error!\n");
+				ret = BINDER_STATS_CTL_RET_INVALID;
+				break;
+			}
+			/*
+			 * 4.19 binder.c extracts node->service_name directly via
+			 * oplus_parse_service_name(), so accept the ioctl cleanly
+			 * without leaking unpruned handle hash entries.
+			 */
+			ret = BINDER_STATS_CTL_RET_SUCC;
+		}
+		break;
 	default: {
 			BINDER_STATS_LOGE("unknown ioctl cmd:%d\n", cmd);
 			ret = BINDER_STATS_CTL_RET_INVALID;
@@ -1086,6 +1117,7 @@ int __init binder_stats_dev_init(void) {
 	mutex_init(&g_binder_stats_driver.lock);
 	spin_lock_init(&g_binder_stats_driver.user_list_lock);
 	INIT_LIST_HEAD(&g_binder_stats_driver.user_list_head);
+	g_binder_stats_driver.srvmgr_tgid = -1;
 
 	err = alloc_chrdev_region(&g_binder_stats_driver.dev, 0, 1, "binder_stats");
 	if (err < 0) {
