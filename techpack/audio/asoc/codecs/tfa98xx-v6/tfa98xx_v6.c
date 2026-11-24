@@ -4679,33 +4679,37 @@ static int tfa98xx_probe(struct snd_soc_component *component)
 #endif
 	tfa98xx_add_widgets(tfa98xx);
 
-	#ifdef OPLUS_ARCH_EXTENDS
-	snd_soc_add_component_controls(tfa98xx->component,
-		tfa98xx_snd_controls, ARRAY_SIZE(tfa98xx_snd_controls));
-	#endif /* OPLUS_ARCH_EXTENDS */
+	{
+		static bool tfa98xx_oplus_ctrls_added;
 
-	#ifdef OPLUS_ARCH_EXTENDS
-	snd_soc_add_component_controls(tfa98xx->component,
-			ftm_spk_rev_controls, ARRAY_SIZE(ftm_spk_rev_controls));
-	#endif /* OPLUS_ARCH_EXTENDS */
+		if (!tfa98xx_oplus_ctrls_added) {
+			tfa98xx_oplus_ctrls_added = true;
+			#ifdef OPLUS_ARCH_EXTENDS
+			snd_soc_add_component_controls(tfa98xx->component,
+				tfa98xx_snd_controls, ARRAY_SIZE(tfa98xx_snd_controls));
+			snd_soc_add_component_controls(tfa98xx->component,
+				ftm_spk_rev_controls, ARRAY_SIZE(ftm_spk_rev_controls));
+			#endif /* OPLUS_ARCH_EXTENDS */
 
-	#ifdef OPLUS_FEATURE_SPEAKER_MUTE
-	snd_soc_add_component_controls(tfa98xx->component,
-		tfa98xx_snd_control_spk_mute, ARRAY_SIZE(tfa98xx_snd_control_spk_mute));
-	#endif /* OPLUS_FEATURE_SPEAKER_MUTE */
+			#ifdef OPLUS_FEATURE_SPEAKER_MUTE
+			snd_soc_add_component_controls(tfa98xx->component,
+				tfa98xx_snd_control_spk_mute, ARRAY_SIZE(tfa98xx_snd_control_spk_mute));
+			#endif /* OPLUS_FEATURE_SPEAKER_MUTE */
 
-	#ifdef OPLUS_FEATURE_FADE_IN
-	snd_soc_add_component_controls(tfa98xx->component,
-		tfadsp_volume_controls, ARRAY_SIZE(tfadsp_volume_controls));
-	#endif /* OPLUS_FEATURE_FADE_IN */
+			#ifdef OPLUS_FEATURE_FADE_IN
+			snd_soc_add_component_controls(tfa98xx->component,
+				tfadsp_volume_controls, ARRAY_SIZE(tfadsp_volume_controls));
+			#endif /* OPLUS_FEATURE_FADE_IN */
 
-	#ifdef OPLUS_FEATURE_MM_FEEDBACK
-	snd_soc_add_component_controls(tfa98xx->component,
-				   tfa98xx_check_feedback, ARRAY_SIZE(tfa98xx_check_feedback));
-	#endif
-	#ifdef OPLUS_FEATURE_SMARTPA_PM
-	add_smartpa_pm_controls(tfa98xx->component);
-	#endif /* OPLUS_FEATURE_SMARTPA_PM */
+			#ifdef OPLUS_FEATURE_MM_FEEDBACK
+			snd_soc_add_component_controls(tfa98xx->component,
+				tfa98xx_check_feedback, ARRAY_SIZE(tfa98xx_check_feedback));
+			#endif
+			#ifdef OPLUS_FEATURE_SMARTPA_PM
+			add_smartpa_pm_controls(tfa98xx->component);
+			#endif /* OPLUS_FEATURE_SMARTPA_PM */
+		}
+	}
 
 	dev_info(component->dev, "%s: codec registered (%s) ret=%d",
 							__func__, tfa98xx->fw.name, ret);
@@ -5263,13 +5267,20 @@ static int tfa98xx_i2c_probe(struct i2c_client *i2c,
 		tfa98xx_debug_init(tfa98xx, i2c);
 
 	#ifdef OPLUS_ARCH_EXTENDS
-	#ifdef CONFIG_DEBUG_FS
-	tfa98xx_debugfs = debugfs_create_file(TFA98XX_DEBUG_FS_NAME,
-			S_IFREG | S_IRUGO | S_IWUSR, NULL, (void *)TFA98XX_DEBUG_FS_NAME, &tfa98xx_debug_ops);
-	#else
-	proc_create_data(TFA98XX_DEBUG_FS_NAME,
-				S_IFREG | S_IRUGO | S_IWUSR, NULL, &tfa98xx_debug_ops, (void *)TFA98XX_DEBUG_FS_NAME);
-	#endif /*CONFIG_DEBUG_FS*/
+	{
+		static bool tfa98xx_ftm_node_created;
+
+		if (!tfa98xx_ftm_node_created) {
+			tfa98xx_ftm_node_created = true;
+			#ifdef CONFIG_DEBUG_FS
+			tfa98xx_debugfs = debugfs_create_file(TFA98XX_DEBUG_FS_NAME,
+					S_IFREG | S_IRUGO | S_IWUSR, NULL, (void *)TFA98XX_DEBUG_FS_NAME, &tfa98xx_debug_ops);
+			#else
+			proc_create_data(TFA98XX_DEBUG_FS_NAME,
+					S_IFREG | S_IRUGO | S_IWUSR, NULL, &tfa98xx_debug_ops, (void *)TFA98XX_DEBUG_FS_NAME);
+			#endif /*CONFIG_DEBUG_FS*/
+		}
+	}
 
 	ftm_mode = get_boot_mode();
 	pr_info("ftm_mode=%d\n", ftm_mode);
