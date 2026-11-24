@@ -379,6 +379,8 @@ ifeq ($(CONFIG_DEBUG_FS), y)
        CONFIG_WLAN_POWER_DEBUGFS := y
 endif
 
+CONFIG_WLAN_POWER_DEBUG := y
+
 # Feature flags which are not (currently) configurable via Kconfig
 
 #Whether to build debug version
