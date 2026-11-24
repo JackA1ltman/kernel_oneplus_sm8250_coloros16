@@ -3448,6 +3448,7 @@ static int bq28z610_update_sub_soc_smooth_parameter(void)
 
 int bq27541_get_passedchg(int *val)
 {
+	static int pre_passedchg;
 	int rc = -1;
 	struct chip_bq27541 *chip;
 
@@ -3459,8 +3460,10 @@ int bq27541_get_passedchg(int *val)
 
 	chip = gauge_ic;
 
-	if (atomic_read(&gauge_ic->suspended) == 1)
-		return rc;
+	if (atomic_read(&gauge_ic->suspended) == 1) {
+		*val = pre_passedchg;
+		return 0;
+	}
 
 	/*enable block data control */
 	if (gauge_ic->batt_bq28z610) {
@@ -3500,10 +3503,13 @@ int bq27541_get_passedchg(int *val)
 		v |= (value << 8);
 	}
 
-	*val = v;
+	if (atomic_read(&gauge_ic->suspended) == 1) {
+		*val = pre_passedchg;
+		return 0;
+	}
 
-	if (atomic_read(&gauge_ic->suspended) == 1)
-		return -1;
+	pre_passedchg = v;
+	*val = v;
 out:
 	return rc;
 }

@@ -1014,7 +1014,7 @@ static void oplus_midas_chg_data_init(void)
 static void oplus_midas_chg_processing(struct oplus_chg_chip *chip)
 {
 	static int inited = 0;
-	int val, ret = 0;
+	int val = 0, ret = 0;
 
 	if (!inited) {
 		oplus_midas_chg_data_init();
@@ -1231,6 +1231,9 @@ int oplus_battery_get_property(struct power_supply *psy, enum power_supply_prope
 			val->intval = 0;
 		else
 			val->intval = chip->time_to_full;
+		break;
+	case POWER_SUPPLY_PROP_CHARGE_TERM_CURRENT:
+		val->intval = chip->limits.iterm_ma;
 		break;
 	default:
 		pr_err("get prop %d is not supported in batt\n", psp);

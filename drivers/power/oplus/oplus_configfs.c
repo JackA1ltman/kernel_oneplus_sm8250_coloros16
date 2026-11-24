@@ -3254,6 +3254,27 @@ static ssize_t chg_up_limit_show(struct device *dev, struct device_attribute *at
 	return sprintf(buf, "%s\n", chg_up_buf);
 }
 
+static ssize_t plc_show(struct device *dev, struct device_attribute *attr, char *buf)
+{
+	struct oplus_chg_chip *chip = NULL;
+
+	chip = (struct oplus_chg_chip *)dev_get_drvdata(oplus_battery_dir);
+	if (!chip) {
+		chg_err("chip is NULL\n");
+		return -EINVAL;
+	}
+
+	return sprintf(buf, "status=%d\n", 0);
+}
+
+static ssize_t plc_store(struct device *dev, struct device_attribute *attr,
+			 const char *buf, size_t count)
+{
+	return -EINVAL;
+}
+
+static DEVICE_ATTR_RW(plc);
+
 DEVICE_ATTR_RW(chg_up_limit);
 
 static ssize_t read_gauge_reg_store(struct device *dev,
@@ -3340,6 +3361,7 @@ static struct device_attribute *oplus_common_attributes[] = {
 	&dev_attr_cpa_power,
 	&dev_attr_chg_up_limit,
 	&dev_attr_non_standard_chg_switch,
+	&dev_attr_plc,
 	NULL
 };
 #ifdef OPLUS_FEATURE_CHG_BASIC
