@@ -210,6 +210,7 @@ bool is_support_panel_seed_mode_exceed(const char *panel_name, int mode) {
 
 	if ((mode >= PANEL_LOADING_EFFECT_FLAG)
 		&& ((!strcmp(panel_name, "ANA6706"))
+		|| (!strcmp(panel_name, "AMB655UV01"))
 		|| (!strcmp(panel_name, "SOFE03F"))
 		|| (!strcmp(panel_name, "AMS662ZS01")))) {
 		return true;
