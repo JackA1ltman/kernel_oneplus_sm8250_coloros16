@@ -59,6 +59,7 @@ __mutex_init(struct mutex *lock, const char *name, struct lock_class_key *key)
 #endif
 #ifdef CONFIG_OPLUS_LOCKING_STRATEGY
 	lock->ux_dep_task = NULL;
+	memset(lock->android_oem_data1, 0, sizeof(lock->android_oem_data1));
 #endif
 	debug_mutex_init(lock, name, key);
 }

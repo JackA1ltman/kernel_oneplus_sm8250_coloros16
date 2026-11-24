@@ -15,6 +15,7 @@
 #include <linux/sched/clock.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
+#include <linux/ratelimit.h>
 #include <linux/moduleparam.h>
 
 #include <linux/sched_assist/sched_assist_common.h>
@@ -156,9 +157,8 @@ static void rwsem_update_ux_cnt_when_remove(struct rw_semaphore *sem)
 	 * of the number caused by ux change when in waiter list.
 	 */
 	if (current->lkinfo.is_block_ux) {
-		/* Count == 0! Something is wrong! */
-		WARN_ON_ONCE(!atomic_long_read(&osem->count));
-		atomic_long_add(-1, &osem->count);
+		if (!atomic_long_add_unless(&osem->count, -1, 0))
+			pr_warn_ratelimited("oplus_locking: rwsem ux count already 0 on wait_finish\n");
 		current->lkinfo.is_block_ux = false;
 	}
 }

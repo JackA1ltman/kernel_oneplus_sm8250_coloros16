@@ -109,6 +109,7 @@ void __init_rwsem(struct rw_semaphore *sem, const char *name,
 #endif
 #ifdef CONFIG_OPLUS_LOCKING_STRATEGY
 	sem->ux_dep_task = NULL;
+	memset(sem->android_oem_data1, 0, sizeof(sem->android_oem_data1));
 #endif
 }
 
