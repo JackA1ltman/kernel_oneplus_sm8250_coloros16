@@ -32,10 +32,10 @@
 static int blkdev_fsync(struct file *filp, loff_t start, loff_t end, int datasync);
 #endif
 
-char global_buffer[LAST_BOOT_REASON_MAX_SIZE] = {0};
+static char global_buffer[LAST_BOOT_REASON_MAX_SIZE] = {0};
 static bool shutdown_recorder_enable = false;
 extern void *return_address(unsigned int);
-int format_buf(char *buf, size_t size, const char *fmt, ...)
+static int format_buf(char *buf, size_t size, const char *fmt, ...)
 {
     va_list args;
     int r;
@@ -173,6 +173,7 @@ static ssize_t last_boot_reason_write(struct file *file, const char __user *buf,
         LAST_BOOT_REASON_PRINTK("%s: read proc input error.\n", __func__);
         return count;
     }
+    global_buffer[count] = '\0';
 
     return count;
 }
@@ -183,7 +184,7 @@ static ssize_t last_boot_reason_read(struct file *file, char __user *buf,
     char page[512] = {0};
     int len = 0;
 
-    len = sprintf(&page[len], global_buffer);
+    len = scnprintf(page, sizeof(page) - 1, "%s", global_buffer);
     page[511] = '\n';
 
     if(len > *off)
@@ -276,11 +277,11 @@ static ssize_t shutdown_recorder_show(struct file *file, char __user *buf,
     .proc_lseek = seq_lseek,
      };
 #else
-    struct file_operations last_boot_reason_fops = {
+    static const struct file_operations last_boot_reason_fops = {
     .write       = last_boot_reason_write,
     .read        = last_boot_reason_read,
      };
-    struct file_operations shutdown_recorder_fops = {
+    static const struct file_operations shutdown_recorder_fops = {
     .write       = shutdown_recorder_trigger,
     .read        = shutdown_recorder_show,
      };
