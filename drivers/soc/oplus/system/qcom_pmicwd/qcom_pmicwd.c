@@ -505,12 +505,13 @@ void pmicwd_init(struct platform_device *pdev, struct qpnp_pon *pon, bool sys_re
 	u32 pon_rt_sts = 0;
 	int rc;
 
-	oplus_ke_proc_dir = proc_mkdir("oplus_ke", NULL);
-	if (oplus_ke_proc_dir == NULL) {
-		pr_info("oplus_ke proc_mkdir failed\n");
+	if (!oplus_ke_proc_dir) {
+		oplus_ke_proc_dir = proc_mkdir("oplus_ke", NULL);
+		if (oplus_ke_proc_dir == NULL)
+			pr_info("oplus_ke proc_mkdir failed\n");
+		else
+			OPLUS_KE_PROC_ENTRY(force_shutdown, force_shutdown, 0600);
 	}
-
-	OPLUS_KE_PROC_ENTRY(force_shutdown, force_shutdown, 0600);
 
 	if (!pon){
 		return;
