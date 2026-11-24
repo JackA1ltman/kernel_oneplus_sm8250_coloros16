@@ -14217,6 +14217,9 @@ int8_t csr_get_cfg_max_tx_power(struct mac_context *mac, uint32_t ch_freq)
 		return maxTxPwr;
 	}
 
+	if (!cfg_length)
+		return maxTxPwr;
+
 	pCountryInfo = qdf_mem_malloc(cfg_length);
 	if (!pCountryInfo)
 		goto error;
