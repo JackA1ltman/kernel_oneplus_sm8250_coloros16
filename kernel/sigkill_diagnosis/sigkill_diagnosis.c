@@ -145,6 +145,8 @@ void record_sigkill_reason(void *unused, int sig, struct task_struct *curr, stru
 	spin_unlock_irqrestore(&g_sigkill_records->lock, flags);
 }
 
+extern struct proc_dir_entry *oplus_mem_proc_dir_get(void);
+
 static int __init sigkill_diagnosis_init(void)
 {
 	struct proc_dir_entry *root_dir_entry;
@@ -157,7 +159,7 @@ static int __init sigkill_diagnosis_init(void)
 	}
 	spin_lock_init(&g_sigkill_records->lock);
 
-	root_dir_entry = proc_mkdir("oplus_mem", NULL);
+	root_dir_entry = oplus_mem_proc_dir_get();
 	g_sigkill_reason_entry = proc_create((root_dir_entry ?
 		"sigkill_reason" : "oplus_mem/sigkill_reason"),
 		0666, root_dir_entry, &proc_sigkill_reason_ops);

@@ -217,9 +217,11 @@ static const struct file_operations proc_fragmentation_index_ops = {
 	.read	= fragmentation_index_read,
 };
 
+extern struct proc_dir_entry *oplus_mem_proc_dir_get(void);
+
 static int __init create_fragmentation_index_proc(void)
 {
-	struct proc_dir_entry *root_dir_entry = proc_mkdir("oplus_mem", NULL);
+	struct proc_dir_entry *root_dir_entry = oplus_mem_proc_dir_get();
 
 	fragmentation_index_entry = proc_create((root_dir_entry ?
 				"fragmentation_index" : "oplus_mem/fragmentation_index"),
