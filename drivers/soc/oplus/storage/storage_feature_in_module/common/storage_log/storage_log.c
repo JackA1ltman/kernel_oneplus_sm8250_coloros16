@@ -12,6 +12,7 @@
 #include <linux/spinlock.h>
 #include <linux/time64.h>
 #include <linux/sched/clock.h>
+#include <linux/uaccess.h>
 
 #define LOG_BUFFER_SIZE 1048576
 #define LOG_LINE_MAX    1024
@@ -147,6 +148,7 @@ static ssize_t log_write(struct file *file,
     return len;
 }
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0))
 static const struct proc_ops log_fops = {
     .proc_open = log_open,
     .proc_read = seq_read,
@@ -154,6 +156,15 @@ static const struct proc_ops log_fops = {
     .proc_release = seq_release,
     .proc_lseek = default_llseek,
 };
+#else
+static const struct file_operations log_fops = {
+    .open = log_open,
+    .read = seq_read,
+    .write = log_write,
+    .release = seq_release,
+    .llseek = default_llseek,
+};
+#endif
 
 int pr_storage(const char *fmt, ...)
 {
