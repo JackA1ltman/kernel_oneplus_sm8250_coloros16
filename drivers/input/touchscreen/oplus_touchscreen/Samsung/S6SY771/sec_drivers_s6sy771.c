@@ -845,9 +845,15 @@ static int sec_power_control(void *chip_data, bool enable)
         TPD_INFO("%s: write sense on %s\n", __func__, (ret < 0) ? "failed" : "success");
         chip_info->is_power_down = false;
         sec_refresh_switch(chip_info->display_refresh_rate);
-        enable_irq(chip_info->client->irq);
+        if (chip_info->irq_disabled) {
+            enable_irq(chip_info->client->irq);
+            chip_info->irq_disabled = false;
+        }
     } else {
-        disable_irq_nosync(chip_info->client->irq);
+        if (!chip_info->irq_disabled) {
+            disable_irq_nosync(chip_info->client->irq);
+            chip_info->irq_disabled = true;
+        }
 
         if (gpio_is_valid(chip_info->hw_res->reset_gpio)) {
             TPD_INFO("Set the reset_gpio 0\n");

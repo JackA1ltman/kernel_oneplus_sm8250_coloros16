@@ -298,6 +298,7 @@ struct chip_data_s6sy771 {
     struct i2c_client               *client;
     u8                              boot_ver[3];
     bool                            is_power_down;
+    bool                            irq_disabled;
     struct hw_resource              *hw_res;
     bool                            cal_needed;
     uint32_t                        flash_page_size;
