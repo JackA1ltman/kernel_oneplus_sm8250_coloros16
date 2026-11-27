@@ -29,6 +29,7 @@
 int mfill_atomic_install_pte(struct mm_struct *dst_mm, pmd_t *dst_pmd,
 			     struct vm_area_struct *dst_vma,
 			     unsigned long dst_addr, struct page *page,
+			     struct mem_cgroup *memcg,
 			     bool newly_allocated)
 {
 	int ret;
@@ -75,8 +76,11 @@ int mfill_atomic_install_pte(struct mm_struct *dst_mm, pmd_t *dst_pmd,
 	 */
 	inc_mm_counter(dst_mm, mm_counter(page));
 
-	if (newly_allocated)
+	if (newly_allocated) {
+		if (memcg)
+			mem_cgroup_commit_charge(page, memcg, false, false);
 		lru_cache_add_active_or_unevictable(page, dst_vma);
+	}
 
 	set_pte_at(dst_mm, dst_addr, dst_pte, _dst_pte);
 
@@ -138,12 +142,11 @@ static int mcopy_atomic_pte(struct mm_struct *dst_mm,
 		goto out_release;
 
 	ret = mfill_atomic_install_pte(dst_mm, dst_pmd, dst_vma, dst_addr,
-				       page, true);
+				       page, memcg, true);
 	if (ret) {
 		mem_cgroup_cancel_charge(page, memcg, false);
 		goto out_release;
 	}
-	mem_cgroup_commit_charge(page, memcg, false, false);
 out:
 	return ret;
 out_release:
@@ -206,7 +209,7 @@ static int mcontinue_atomic_pte(struct mm_struct *dst_mm,
 	}
 
 	ret = mfill_atomic_install_pte(dst_mm, dst_pmd, dst_vma, dst_addr,
-				       page, false);
+				       page, NULL, false);
 	if (ret)
 		goto out_release;
 
